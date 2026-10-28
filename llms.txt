@@ -565,13 +565,6 @@ devtools::check()
 
 to check for errors, and fix warnings and notes
 
-Finally, the readme can be rebuilt using
-
-``` r
-
-rmarkdown::render("README.Rmd")
-```
-
 then changes can be commited and pushed.
 
 # Package index
