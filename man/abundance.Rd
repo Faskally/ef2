@@ -4,7 +4,7 @@
 \alias{abundance}
 \title{Estimate abundance and density from removal samples}
 \usage{
-abundance(object, newdata = NULL, area = NULL, level = 0.95)
+abundance(object, newdata = NULL, area = NULL, by = NULL, level = 0.95)
 }
 \arguments{
 \item{object}{an efp2 fitted model}
@@ -14,7 +14,12 @@ which must also contain the counts used as the response in the model}
 
 \item{area}{an optional name of a column in the data giving the area
 fished, or a vector of areas with one value per row of the data. If
-given, density (abundance per unit area) is also returned.}
+given, density (abundance per unit area) is also returned. With
+\code{by}, the area must be the same for all samples in a group.}
+
+\item{by}{an optional character vector of the names of variables in the
+data, which must be the same for all passes of a sample. Abundance is
+summed over the samples with each combination of their values.}
 
 \item{level}{the confidence level}
 }
@@ -24,7 +29,10 @@ first appear in the data, with columns \code{id}, \code{catch} the
 total catch, \code{P}, \code{N} the estimated abundance, its standard
 error \code{se}, and confidence limits \code{lower} and \code{upper}.
 If \code{area} is given there are also columns \code{area},
-\code{density}, \code{density_lower} and \code{density_upper}.
+\code{density}, \code{density_lower} and \code{density_upper}. With
+\code{by} there is one row per group, sorted by the \code{by}
+variables, with the \code{by} variables and \code{nsample}, the number
+of samples, in place of \code{id} and \code{P}.
 }
 \description{
 Abundance is estimated as \eqn{\hat N = T / P}, where \eqn{T} is the total
@@ -40,6 +48,16 @@ the catch, given \eqn{P}, and the uncertainty in the estimate of
 Confidence intervals are computed on the log scale, and the lower limit
 is not less than the total catch. When the total catch is zero the
 estimated abundance is zero and the confidence limits are \code{NA}.
+
+With \code{by}, abundance is summed over the samples in each group, for
+example over the lifestages caught at a site in a year. The binomial
+variation is independent between samples, but the estimates of \eqn{P}
+are correlated, as they depend on the same model coefficients, and this
+is allowed for:
+\deqn{\textrm{var}(\sum_s \hat N_s) \approx \sum_s \hat N_s (1 - P_s) / P_s +
+  w^\top \Sigma w,}
+where \eqn{w_s = \hat N_s (1 - P_s)} and \eqn{\Sigma} is the covariance
+matrix of \eqn{\textrm{logit}(P_s)}.
 }
 \examples{
 ef2_data$pass12 <- factor(pmin(ef2_data$pass, 2))
@@ -49,6 +67,9 @@ ef2_data <- ef2_data[order(ef2_data$sampleID, ef2_data$pass), ]
 m1 <- efp2(count ~ lifestage + pass12, data = ef2_data,
   pass = pass, id = sampleID)
 head(abundance(m1, area = "area"))
+
+# summed over lifestages for each site and year
+head(abundance(m1, area = "area", by = c("siteID", "year")))
 }
 \references{
 Huggins, R. M. (1989) On the statistical analysis of capture experiments.

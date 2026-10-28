@@ -214,6 +214,14 @@ dens <- abundance(m1, area = "area")
 head(dens)
 ```
 
+Abundance can be summed over samples using `by`, for example over the fry and parr at each site in each year, or over all the sites in each year. The confidence intervals allow for the correlation between the estimates of $P$, which depend on the same model coefficients
+
+```{r}
+site_year <- abundance(m1, area = "area", by = c("siteID", "year"))
+head(site_year)
+abundance(m1, by = "year")
+```
+
 To model counts directly, for example with a Poisson model, the offset is $\log(A P)$
 
 ```{r}

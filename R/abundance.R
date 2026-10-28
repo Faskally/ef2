@@ -41,6 +41,28 @@
 #' @importFrom stats qlogis qnorm
 #' @export
 capture_prob <- function(object, newdata = NULL, se.fit = FALSE, level = 0.95) {
+  cp <- capture_prob_parts(object, newdata, gradient = se.fit)
+
+  out <- data.frame(
+    id = unique(cp$id),
+    npass = as.vector(table(cp$sample)),
+    P = cp$P
+  )
+
+  if (se.fit) {
+    out$se <- sqrt(pmax(0, rowSums((cp$J %*% object$Vp) * cp$J)))
+    z <- qnorm(1 - (1 - level) / 2)
+    out$lower <- plogis(qlogis(cp$P) - z * out$se)
+    out$upper <- plogis(qlogis(cp$P) + z * out$se)
+  }
+
+  rownames(out) <- NULL
+  out
+}
+
+# the cumulative capture probability of each sample, and optionally the
+# gradient of logit(P) with respect to the coefficients in Vp
+capture_prob_parts <- function(object, newdata = NULL, gradient = FALSE) {
   data <- if (is.null(newdata)) object$data else newdata
   id <- call_variable(object, "id", data)
   sample <- factor(id, levels = unique(id))
@@ -50,13 +72,8 @@ capture_prob <- function(object, newdata = NULL, se.fit = FALSE, level = 0.95) {
   log_q <- plogis(eta, lower.tail = FALSE, log.p = TRUE)
   P <- -expm1(drop(rowsum(log_q, sample, reorder = FALSE)))
 
-  out <- data.frame(
-    id = unique(id),
-    npass = as.vector(table(sample)),
-    P = P
-  )
-
-  if (se.fit) {
+  J <- NULL
+  if (gradient) {
     if (!is.matrix(object$Vp)) {
       stop("standard errors are not available: refit the model with hessian = TRUE")
     }
@@ -65,14 +82,9 @@ capture_prob <- function(object, newdata = NULL, se.fit = FALSE, level = 0.95) {
     # gradient of logit(P) for each sample: sum over passes of x_i p_i / P
     p <- plogis(eta)
     J <- rowsum(as.matrix(X) * (p / P[as.integer(sample)]), sample, reorder = FALSE)
-    out$se <- sqrt(pmax(0, rowSums((J %*% object$Vp) * J)))
-    z <- qnorm(1 - (1 - level) / 2)
-    out$lower <- plogis(qlogis(P) - z * out$se)
-    out$upper <- plogis(qlogis(P) + z * out$se)
   }
 
-  rownames(out) <- NULL
-  out
+  list(data = data, id = id, sample = sample, P = P, J = J)
 }
 
 #' Estimate abundance and density from removal samples
@@ -90,18 +102,35 @@ capture_prob <- function(object, newdata = NULL, se.fit = FALSE, level = 0.95) {
 #' is not less than the total catch. When the total catch is zero the
 #' estimated abundance is zero and the confidence limits are \code{NA}.
 #'
+#' With \code{by}, abundance is summed over the samples in each group, for
+#' example over the lifestages caught at a site in a year. The binomial
+#' variation is independent between samples, but the estimates of \eqn{P}
+#' are correlated, as they depend on the same model coefficients, and this
+#' is allowed for:
+#' \deqn{\textrm{var}(\sum_s \hat N_s) \approx \sum_s \hat N_s (1 - P_s) / P_s +
+#'   w^\top \Sigma w,}
+#' where \eqn{w_s = \hat N_s (1 - P_s)} and \eqn{\Sigma} is the covariance
+#' matrix of \eqn{\textrm{logit}(P_s)}.
+#'
 #' @inheritParams capture_prob
 #' @param newdata an optional data.frame as for \code{\link{capture_prob}},
 #'   which must also contain the counts used as the response in the model
 #' @param area an optional name of a column in the data giving the area
 #'   fished, or a vector of areas with one value per row of the data. If
-#'   given, density (abundance per unit area) is also returned.
+#'   given, density (abundance per unit area) is also returned. With
+#'   \code{by}, the area must be the same for all samples in a group.
+#' @param by an optional character vector of the names of variables in the
+#'   data, which must be the same for all passes of a sample. Abundance is
+#'   summed over the samples with each combination of their values.
 #' @return a data.frame with one row per sample, in the order the samples
 #'   first appear in the data, with columns \code{id}, \code{catch} the
 #'   total catch, \code{P}, \code{N} the estimated abundance, its standard
 #'   error \code{se}, and confidence limits \code{lower} and \code{upper}.
 #'   If \code{area} is given there are also columns \code{area},
-#'   \code{density}, \code{density_lower} and \code{density_upper}.
+#'   \code{density}, \code{density_lower} and \code{density_upper}. With
+#'   \code{by} there is one row per group, sorted by the \code{by}
+#'   variables, with the \code{by} variables and \code{nsample}, the number
+#'   of samples, in place of \code{id} and \code{P}.
 #' @references
 #' Huggins, R. M. (1989) On the statistical analysis of capture experiments.
 #' Biometrika, 76, 133-140. \doi{10.1093/biomet/76.1.133}
@@ -114,11 +143,16 @@ capture_prob <- function(object, newdata = NULL, se.fit = FALSE, level = 0.95) {
 #' m1 <- efp2(count ~ lifestage + pass12, data = ef2_data,
 #'   pass = pass, id = sampleID)
 #' head(abundance(m1, area = "area"))
+#'
+#' # summed over lifestages for each site and year
+#' head(abundance(m1, area = "area", by = c("siteID", "year")))
 #' @export
-abundance <- function(object, newdata = NULL, area = NULL, level = 0.95) {
-  data <- if (is.null(newdata)) object$data else newdata
-  id <- call_variable(object, "id", data)
-  sample <- factor(id, levels = unique(id))
+abundance <- function(object, newdata = NULL, area = NULL, by = NULL,
+  level = 0.95) {
+  cp <- capture_prob_parts(object, newdata, gradient = TRUE)
+  data <- cp$data
+  sample <- cp$sample
+  P <- cp$P
 
   y <- tryCatch(
     eval(object$formula[[2]], data, environment(object$formula)),
@@ -127,24 +161,51 @@ abundance <- function(object, newdata = NULL, area = NULL, level = 0.95) {
   if (is.null(y) || length(y) != nrow(data)) {
     stop("the data must contain the counts used as the response in the model")
   }
+  catch <- as.vector(rowsum(y, sample, reorder = FALSE))
+  N <- catch / P
 
-  out <- capture_prob(object, newdata = newdata, se.fit = TRUE, level = level)
-  out$npass <- NULL
-  out$catch <- as.vector(rowsum(y, sample, reorder = FALSE))
-  out <- out[c("id", "catch", "P", "se", "lower", "upper")]
-  se_logitP <- out$se
-  out$lower <- out$upper <- NULL
+  # one value per sample of a variable with one value per row of the data
+  per_sample <- function(x, what) {
+    x <- tapply(x, sample, unique, simplify = FALSE)
+    if (any(lengths(x) != 1)) {
+      stop(what, " must be the same for all passes of a sample")
+    }
+    unlist(x, use.names = FALSE)
+  }
 
-  P <- out$P
-  N <- out$catch / P
-  var_N <- N * (1 - P) / P + N^2 * (1 - P)^2 * se_logitP^2
-  out$N <- N
-  out$se <- sqrt(var_N)
+  # groups of samples
+  if (is.null(by)) {
+    out <- data.frame(id = unique(cp$id))
+    group <- factor(seq_along(P))
+  } else {
+    missing <- setdiff(by, names(data))
+    if (length(missing)) {
+      stop("the data must contain the 'by' variables: ", paste(missing, collapse = ", "))
+    }
+    out <- as.data.frame(lapply(data[by], per_sample, what = "the 'by' variables"))
+    group <- interaction(out, drop = TRUE, lex.order = TRUE)
+    group <- factor(group, levels = unique(group))
+    out <- out[!duplicated(group), , drop = FALSE]
+    out$nsample <- as.vector(table(group))
+  }
+
+  # variance: binomial variation in the catch of each sample given P, which
+  # is independent between samples, and the uncertainty in P, which is
+  # correlated between samples. The derivative of N with respect to
+  # logit(P) is -N (1 - P)
+  var_binom <- rowsum(N * (1 - P) / P, group, reorder = FALSE)
+  G <- rowsum(cp$J * (N * (1 - P)), group, reorder = FALSE)
+  var_P <- rowSums((G %*% object$Vp) * G)
+
+  out$catch <- as.vector(rowsum(catch, group, reorder = FALSE))
+  if (is.null(by)) out$P <- P
+  out$N <- as.vector(rowsum(N, group, reorder = FALSE))
+  out$se <- sqrt(as.vector(var_binom) + pmax(0, var_P))
 
   z <- qnorm(1 - (1 - level) / 2)
-  cv <- out$se / N
-  out$lower <- pmax(out$catch, N * exp(-z * cv))
-  out$upper <- N * exp(z * cv)
+  cv <- out$se / out$N
+  out$lower <- pmax(out$catch, out$N * exp(-z * cv))
+  out$upper <- out$N * exp(z * cv)
   zero <- out$catch == 0
   out$lower[zero] <- out$upper[zero] <- NA
 
@@ -155,16 +216,20 @@ abundance <- function(object, newdata = NULL, area = NULL, level = 0.95) {
     if (length(area) != nrow(data)) {
       stop("area must be a column name or have one value per row of the data")
     }
-    a <- tapply(area, sample, unique, simplify = FALSE)
-    if (any(lengths(a) != 1)) {
-      stop("area must be the same for all passes of a sample")
+    area <- tapply(per_sample(area, "area"), group, unique, simplify = FALSE)
+    if (any(lengths(area) != 1)) {
+      stop("area must be the same for all samples in a group: density is only ",
+        "given when each group of samples is from a single area fished")
     }
-    out$area <- unlist(a)
+    out$area <- unlist(area, use.names = FALSE)
     out$density <- out$N / out$area
     out$density_lower <- out$lower / out$area
     out$density_upper <- out$upper / out$area
   }
 
+  if (!is.null(by)) {
+    out <- out[do.call(order, unname(out[by])), , drop = FALSE]
+  }
   rownames(out) <- NULL
   out
 }

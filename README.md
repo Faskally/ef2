@@ -110,7 +110,7 @@ m1 <-
     ## 
     ## Formula:
     ## count ~ siteID + fyear + pass12 + lifestage
-    ## <environment: 0x5577755fd210>
+    ## <environment: 0x5ff25a9f7210>
     ## 
     ## No random effects
     ## 
@@ -169,7 +169,7 @@ m1_smooth <-
     ## Formula:
     ## count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
     ##     pass12 + lifestage
-    ## <environment: 0x5577755fd210>
+    ## <environment: 0x5ff25a9f7210>
     ## 
     ## Random effects:
     ##                Estimate Std. Error
@@ -248,7 +248,7 @@ m1_doy <-
     ## Formula:
     ## count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
     ##     pass12 + lifestage
-    ## <environment: 0x5577755fd210>
+    ## <environment: 0x5ff25a9f7210>
     ## 
     ## Random effects:
     ##                Estimate Std. Error
@@ -341,13 +341,13 @@ dens <- abundance(m1, area = "area")
 head(dens)
 ```
 
-    ##   id catch         P       se         N    lower     upper area   density
-    ## 1  2    42 0.9838939 0.892726  42.68753  42.0000  44.47359  122 0.3498978
-    ## 2  1    49 0.9457095 2.047553  51.81295  49.0000  55.98559  122 0.4246963
-    ## 3 29   140 0.9210062 5.329788 152.00766 141.9123 162.82116  122 1.2459644
-    ## 4 30    41 0.9745545 1.141402  42.07050  41.0000  44.36816  122 0.3448402
-    ## 5 16    86 0.9855114 1.238831  87.26434  86.0000  89.72650  122 0.7152815
-    ## 6 15    50 0.9502933 1.940101  52.61533  50.0000  56.55864  122 0.4312732
+    ##   id catch         P         N       se    lower     upper area   density
+    ## 1  2    42 0.9838939  42.68753 0.892726  42.0000  44.47359  122 0.3498978
+    ## 2  1    49 0.9457095  51.81295 2.047553  49.0000  55.98559  122 0.4246963
+    ## 3 29   140 0.9210062 152.00766 5.329788 141.9123 162.82116  122 1.2459644
+    ## 4 30    41 0.9745545  42.07050 1.141402  41.0000  44.36816  122 0.3448402
+    ## 5 16    86 0.9855114  87.26434 1.238831  86.0000  89.72650  122 0.7152815
+    ## 6 15    50 0.9502933  52.61533 1.940101  50.0000  56.55864  122 0.4312732
     ##   density_lower density_upper
     ## 1     0.3442623     0.3645377
     ## 2     0.4016393     0.4588983
@@ -355,6 +355,42 @@ head(dens)
     ## 4     0.3360656     0.3636734
     ## 5     0.7049180     0.7354631
     ## 6     0.4098361     0.4635954
+
+Abundance can be summed over samples using `by`, for example over the
+fry and parr at each site in each year, or over all the sites in each
+year. The confidence intervals allow for the correlation between the
+estimates of $P$, which depend on the same model coefficients
+
+``` r
+site_year <- abundance(m1, area = "area", by = c("siteID", "year"))
+head(site_year)
+```
+
+    ##   siteID year nsample catch         N       se    lower     upper area
+    ## 1  Site1 2011       2    91  94.50048 2.356786  91.0000  99.23445  122
+    ## 2  Site1 2012       2   181 194.07817 5.702209 183.2177 205.58235  122
+    ## 3  Site1 2013       2   136 139.87967 2.468399 136.0000 144.80228  122
+    ## 4  Site1 2014       2   119 121.34350 1.798448 119.0000 124.92009  122
+    ## 5  Site1 2015       2    98 101.89283 2.600999  98.0000 107.12037  124
+    ## 6  Site2 2011       2   157 162.12955 3.031428 157.0000 168.18125  264
+    ##     density density_lower density_upper
+    ## 1 0.7745941     0.7459016     0.8133972
+    ## 2 1.5908046     1.5017848     1.6851012
+    ## 3 1.1465547     1.1147541     1.1869040
+    ## 4 0.9946188     0.9754098     1.0239351
+    ## 5 0.8217164     0.7903226     0.8638740
+    ## 6 0.6141271     0.5946970     0.6370502
+
+``` r
+abundance(m1, by = "year")
+```
+
+    ##   year nsample catch        N        se    lower    upper
+    ## 1 2011       6   355 368.0506  5.889016 356.6874 379.7757
+    ## 2 2012       6   688 734.4195 14.606285 706.3425 763.6125
+    ## 3 2013       6   473 482.8034  4.484568 474.0934 491.6735
+    ## 4 2014       6   493 501.3551  4.028927 493.5204 509.3141
+    ## 5 2015       6   273 280.4354  4.017294 273.0000 288.4207
 
 To model counts directly, for example with a Poisson model, the offset
 is $\log(A P)$
@@ -400,7 +436,7 @@ mfull
     ## Formula:
     ## count ~ siteID + year + lifestage + pass12 + s(visitID, bs = "re") + 
     ##     s(fsampleID, bs = "re")
-    ## <environment: 0x5577755fd210>
+    ## <environment: 0x5ff25a9f7210>
     ## 
     ## Random effects:
     ##                     Estimate Std. Error

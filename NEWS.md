@@ -17,7 +17,8 @@
   are affected, instead of "NaNs produced"
 * new `capture_prob()` and `abundance()` give the cumulative capture
   probability, abundance and density of each sample with confidence
-  intervals; the cumulative capture probability is also reported in `$P`
+  intervals, optionally summed over groups of samples with `by`; the
+  cumulative capture probability is also reported in `$P`
 
 # ef 2.0.0 (2026-10-09)
 

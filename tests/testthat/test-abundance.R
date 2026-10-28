@@ -128,3 +128,74 @@ test_that("informative errors", {
     hessian = FALSE)
   expect_error(capture_prob(m0, se.fit = TRUE), "hessian = TRUE")
 })
+
+test_that("abundance summed by group", {
+  data <- prep_data()
+  m1 <- efp2(count ~ lifestage + pass12, data = data, pass = pass, id = sampleID)
+  a <- abundance(m1)
+
+  # each sample its own group gives the same estimates
+  by_id <- abundance(m1, by = "sampleID")
+  by_id <- by_id[match(a$id, by_id$sampleID), ]
+  expect_equal(by_id$N, a$N)
+  expect_equal(by_id$se, a$se)
+  expect_equal(by_id$lower, a$lower)
+
+  # sums over the lifestages at each site in each year
+  g <- abundance(m1, by = c("siteID", "year"), area = "area")
+  samples <- unique(data[c("sampleID", "siteID", "year")])
+  samples <- samples[match(a$id, samples$sampleID), ]
+  key <- paste(samples$siteID, samples$year)
+  gkey <- paste(g$siteID, g$year)
+  expect_equal(g$N, as.vector(tapply(a$N, key, sum)[gkey]))
+  expect_equal(g$catch, as.vector(tapply(a$catch, key, sum)[gkey]))
+  expect_equal(g$nsample, rep(2, nrow(g)))
+  expect_false(is.unsorted(order(g$siteID, g$year)))
+  expect_equal(g$density, g$N / g$area)
+
+  # variance from the full covariance of logit(P), with a finite
+  # difference gradient
+  cp <- capture_prob(m1)
+  h <- 1e-6
+  J <- sapply(m1$gam_cols, function(j) {
+    up <- down <- m1
+    up$gam_coefficients[j] <- up$gam_coefficients[j] + h
+    down$gam_coefficients[j] <- down$gam_coefficients[j] - h
+    (qlogis(capture_prob(up)$P) - qlogis(capture_prob(down)$P)) / (2 * h)
+  })
+  Sigma <- J %*% m1$Vp %*% t(J)
+  w <- a$N * (1 - cp$P)
+  var_g <- sapply(gkey, function(k) {
+    s <- key == k
+    sum(a$N[s] * (1 - cp$P[s]) / cp$P[s]) + drop(t(w[s]) %*% Sigma[s, s] %*% w[s])
+  })
+  expect_equal(g$se^2, unname(var_g), tolerance = 1e-6)
+
+  # the estimates are positively correlated, so the variance of a sum is
+  # more than the sum of the variances
+  y <- abundance(m1, by = "year")
+  year_of <- as.character(samples$year)
+  expect_true(all(y$se^2 > tapply(a$se^2, year_of, sum)[as.character(y$year)]))
+})
+
+test_that("summed abundance confidence intervals have the nominal coverage", {
+  sim <- sim_removal(ns = 600, N = 30, p = 0.3)
+  sim$data$group <- (sim$data$sample - 1) %/% 3
+  m <- efp2(n ~ 1, data = sim$data, pass = pass, id = sample)
+  a <- abundance(m, by = "group")
+  truth <- tapply(sim$N, (seq_along(sim$N) - 1) %/% 3, sum)
+  coverage <- mean(a$lower <= truth & truth <= a$upper)
+  expect_gt(coverage, 0.9)
+  expect_lt(coverage, 0.99)
+})
+
+test_that("informative errors for summed abundance", {
+  data <- prep_data()
+  m1 <- efp2(count ~ lifestage + pass12, data = data, pass = pass, id = sampleID)
+
+  expect_error(abundance(m1, by = "nothing"), "nothing")
+  # pass varies within a sample
+  expect_error(abundance(m1, by = "pass"), "same for all passes")
+  # sites have different areas in different years
+  expect_error(abundance(m1, by = "siteID", area = "area"), "single area")
+})
