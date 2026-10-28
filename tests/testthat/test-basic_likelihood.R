@@ -82,7 +82,7 @@ test_that("simple model fits", {
   expect_equivalent(coef(m1), 0.9734342, tolerance = 1e-5)
   expect_equivalent(as.numeric(logLik(m1)), -1612.81836111119, tolerance = 1e-9)
 
-  expect_equivalent(coef(m2), c(0.6666140, 0.6450585, -0.2563096), tolerance = 1e-4)
+  expect_equivalent(coef(m2), c(0.6667138, 0.6449398, -0.2562418), tolerance = 1e-4)
   expect_equivalent(as.numeric(logLik(m2)), -1592.30666991703, tolerance = 1e-9)
 
   expect_equivalent(

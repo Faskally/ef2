@@ -2,6 +2,8 @@
 
 * package renamed from ef to ef2 so it can be installed alongside ef 1.x;
   fitted models now have class `efp2`
+* models are fitted with `nlminb()` rather than `optim()` (BFGS), which
+  falsely converged on some platforms; `control` is passed to `nlminb()`
 
 # ef 2.0.0 (2026-10-09)
 

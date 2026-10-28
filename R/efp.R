@@ -14,7 +14,7 @@
 #' @param verbose if TRUE optimiser messages are printed to the screen
 #' @param hessian if TRUE the hessian is computed and the covariance matrix of the parameters is returned via Vb
 #' @param fit if TRUE model is fitted if FALSE the data that would be passed to the optimiser is returned
-#' @param control a list of control commands to be passed to \code{\link[stats]{optim}}
+#' @param control a list of control commands to be passed to \code{\link[stats]{nlminb}}
 #' @param sparse if TRUE (the default) penalised smooths are set up so that
 #'   sparse bases and penalties stay sparse, see Details. If FALSE the
 #'   constrained basis and penalties from \code{mgcv} are used, which are
@@ -169,7 +169,7 @@
 #' @importFrom methods as
 #' @import Matrix
 #' @importFrom stats binomial
-#' @importFrom stats optim
+#' @importFrom stats nlminb
 #' @importFrom stats ave
 #'
 #' @export
@@ -311,12 +311,12 @@ efp <- function(formula, data = NULL, pass = pass, id = id,
       silent = !verbose
     )
 
-  opt <- optim(obj$par, obj$fn, obj$gr, method = "BFGS", control = control)
+  opt <- nlminb(obj$par, obj$fn, obj$gr, control = control)
   
   # check convergence
   
   if (opt$convergence != 0) {
-    warning("model has not converged: optim convergence code = ", opt$convergence)
+    warning("model has not converged: ", opt$message)
   }
   
   # set up output object

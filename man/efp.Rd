@@ -36,7 +36,7 @@ using other \code{s()} terms, see Details.}
 
 \item{fit}{if TRUE model is fitted if FALSE the data that would be passed to the optimiser is returned}
 
-\item{control}{a list of control commands to be passed to \code{\link[stats]{optim}}}
+\item{control}{a list of control commands to be passed to \code{\link[stats]{nlminb}}}
 
 \item{sparse}{if TRUE (the default) penalised smooths are set up so that
 sparse bases and penalties stay sparse, see Details. If FALSE the
