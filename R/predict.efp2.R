@@ -40,7 +40,7 @@
 #' newdata <- data.frame(lifestage = c("Fry", "Parr"))
 #' predict(m1, newdata = newdata, type = "response", se.fit = TRUE)
 #'
-#' @importFrom stats predict model.frame model.matrix delete.response plogis
+#' @importFrom stats predict model.frame model.matrix delete.response
 #' @importFrom mgcv PredictMat
 #' @export
 predict.efp2 <- function(object, newdata = NULL,

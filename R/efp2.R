@@ -165,7 +165,7 @@
 #' m6
 #'
 #' @importFrom RTMB MakeADFun sdreport ADREPORT REPORT dnorm dgmrf
-#' @importFrom RTMB logspace_add logspace_sub
+#' @importFrom RTMB logspace_add logspace_sub plogis
 #' @importFrom mgcv gam
 #' @importFrom methods as
 #' @import Matrix
