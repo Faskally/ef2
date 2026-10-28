@@ -14,13 +14,13 @@
 #' @return an object of class \code{gam}, see \code{\link[mgcv]{gamObject}}
 #'
 #' @examples
-#' data(ef_data)
-#' ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
-#'                                  ef_data$lifestage, ef_data$species))
+#' data(ef2_data)
+#' ef2_data$sampleID <- factor(paste(ef2_data$date, ef2_data$siteID,
+#'                                  ef2_data$lifestage, ef2_data$species))
 #' m1 <- efp2(count ~ lifestage + s(doy, k = 3),
-#'           data = ef_data, pass = pass, id = sampleID)
+#'           data = ef2_data, pass = pass, id = sampleID)
 #'
-#' m1_gam <- as.gam(m1)
+#' m1_gam <- as.gam2(m1)
 #' plot(m1_gam)
 #'
 #' @importFrom mgcv gam
@@ -28,7 +28,7 @@
 #' @importFrom methods is
 #'
 #' @export
-as.gam <- function(object) {
+as.gam2 <- function(object) {
   stopifnot(is(object)[1] == "efp2")
   g1 <- efp_gam(object)
 

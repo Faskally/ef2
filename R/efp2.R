@@ -89,7 +89,7 @@
 #'
 #' @examples
 #' # create two electrofishing site visits with 3 and 4 passes and 2 lifestages
-#' ef_data <- data.frame(n      = c(100, 53, 24, 50, 26, 12,
+#' ef2_data <- data.frame(n      = c(100, 53, 24, 50, 26, 12,
 #'                                  100, 53, 24, 50, 26, 12),
 #'                       pass   = c(  1,  2,  3,  1,  2,  3,
 #'                                    1,  2,  3,  1,  2,  3),
@@ -117,15 +117,15 @@
 #'                                     3,  3,  3,  3,  4,  4,  4, 4, 6))
 #'
 #' # Fit a simple model
-#' m2 <- efp2(n ~ 1 + factor(stage), data = ef_data, pass = pass, id = sample)
-#' cbind(ef_data, fit = fitted(m2))
+#' m2 <- efp2(n ~ 1 + factor(stage), data = ef2_data, pass = pass, id = sample)
+#' cbind(ef2_data, fit = fitted(m2))
 #' m3 <- efp2(n ~ 1 + factor(stage), data = ef_data2, pass = pass, id = sample)
 #' cbind(ef_data2, fit = fitted(m3))
 #' m4 <- efp2(n ~ 1 + factor(stage), data = ef_data3, pass = pass, id = sample)
 #' cbind(ef_data3, fit = fitted(m4))
 #'
 #' # create two electrofishing site visits with 3 and 4 passes and 2 lifestages
-#' ef_data <- data.frame(n      = c(200, 53, 24, 100, 26, 12,
+#' ef2_data <- data.frame(n      = c(200, 53, 24, 100, 26, 12,
 #'                                  200, 53, 24, 100, 26, 12),
 #'                       pass   = c(  1,  2,  3,  1,  2,  3,
 #'                                    1,  2,  3,  1,  2,  3),
@@ -135,22 +135,22 @@
 #'                                    3,  3,  3,  4,  4,  4))
 #' # Fit a simple model
 #' m2 <- efp2(n ~ 1 + factor(stage) + factor(replace(pass, pass> 2, 2)),
-#'           data = ef_data, pass = pass, id = sample)
-#' out <- cbind(ef_data, p = fitted(m2, type = "p"))
+#'           data = ef2_data, pass = pass, id = sample)
+#' out <- cbind(ef2_data, p = fitted(m2, type = "p"))
 #' out
 #'
 #' # a smooth effect of a continuous covariate, day of the year, using a
 #' # second order random walk
-#' data(ef_data)
-#' ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
-#'                                  ef_data$lifestage, ef_data$species))
-#' ef_data$pass12 <- factor(replace(ef_data$pass, ef_data$pass > 2, 2))
-#' days <- min(ef_data$doy):max(ef_data$doy)
-#' ef_data$fdoy <- factor(ef_data$doy, levels = days)
+#' data(ef2_data)
+#' ef2_data$sampleID <- factor(paste(ef2_data$date, ef2_data$siteID,
+#'                                  ef2_data$lifestage, ef2_data$species))
+#' ef2_data$pass12 <- factor(replace(ef2_data$pass, ef2_data$pass > 2, 2))
+#' days <- min(ef2_data$doy):max(ef2_data$doy)
+#' ef2_data$fdoy <- factor(ef2_data$doy, levels = days)
 #' rw2 <- rw_penalty(days, order = 2)
 #' m5 <- efp2(count ~ siteID + pass12 + lifestage +
 #'             s(fdoy, bs = "mrf", xt = list(penalty = rw2)),
-#'           data = ef_data, pass = pass, id = sampleID)
+#'           data = ef2_data, pass = pass, id = sampleID)
 #' m5
 #'
 #' # predicted capture probability over the smooth, with standard errors
@@ -161,7 +161,7 @@
 #'
 #' # an unpenalised regression spline
 #' m6 <- efp2(count ~ siteID + pass12 + lifestage + s(doy, k = 3, fx = TRUE),
-#'           data = ef_data, pass = pass, id = sampleID)
+#'           data = ef2_data, pass = pass, id = sampleID)
 #' m6
 #'
 #' @importFrom RTMB MakeADFun sdreport ADREPORT REPORT dnorm dgmrf

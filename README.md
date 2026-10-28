@@ -58,7 +58,7 @@ same capture probability avoids problems with model identifiability
 ([Millar *et al*., 2016](https://doi.org/10.1016/j.fishres.2016.01.001))
 
 ``` r
-ef_data$pass12 <- factor(replace(ef_data$pass, ef_data$pass > 2, 2))
+ef2_data$pass12 <- factor(replace(ef2_data$pass, ef2_data$pass > 2, 2))
 ```
 
 Create a sampleID for grouping EF counts together. A sample is a unique
@@ -66,10 +66,10 @@ combination of site visit x species x lifestage and is required by the
 EF function
 
 ``` r
-ef_data$sampleID <-
+ef2_data$sampleID <-
   as.numeric(
     factor(
-      paste(ef_data$date, ef_data$siteID, ef_data$lifestage, ef_data$species)
+      paste(ef2_data$date, ef2_data$siteID, ef2_data$lifestage, ef2_data$species)
     )
   )
 ```
@@ -78,13 +78,13 @@ Create a visitID for unique site visits. This is used to include between
 visit variation as a random effect (see below).
 
 ``` r
-ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
+ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
 ```
 
 Create a factor for year
 
 ``` r
-ef_data$fyear <- factor(ef_data$year)
+ef2_data$fyear <- factor(ef2_data$year)
 ```
 
 # Fit a Model
@@ -99,13 +99,13 @@ further details.
 m1 <-
   efp2(
     count ~ siteID + fyear + pass12 + lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 ```
 
     ## 
     ## Call:
-    ## efp2(formula = count ~ siteID + fyear + pass12 + lifestage, data = ef_data, 
+    ## efp2(formula = count ~ siteID + fyear + pass12 + lifestage, data = ef2_data, 
     ##     pass = pass, id = sampleID)
     ## 
     ## Formula:
@@ -150,20 +150,20 @@ in order. Here the year factor is replaced by a first order random walk
 over years.
 
 ``` r
-rw1 <- rw_penalty(levels(ef_data$fyear), order = 1)
+rw1 <- rw_penalty(levels(ef2_data$fyear), order = 1)
 
 m1_smooth <-
   efp2(
     count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) +
       pass12 + lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 ```
 
     ## 
     ## Call:
     ## efp2(formula = count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
-    ##     pass12 + lifestage, data = ef_data, pass = pass, id = sampleID)
+    ##     pass12 + lifestage, data = ef2_data, pass = pass, id = sampleID)
     ## 
     ## Formula:
     ## count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
@@ -195,10 +195,10 @@ pass for fry at Site1, with approximate 95% confidence intervals
 newdata <-
   data.frame(
     siteID = "Site1", pass12 = "1", lifestage = "Fry",
-    fyear = factor(levels(ef_data$fyear), levels = levels(ef_data$fyear))
+    fyear = factor(levels(ef2_data$fyear), levels = levels(ef2_data$fyear))
   )
 pred <- predict(m1_smooth, newdata = newdata, se.fit = TRUE)
-year <- as.numeric(levels(ef_data$fyear))
+year <- as.numeric(levels(ef2_data$fyear))
 
 plot(year, plogis(pred$fit), type = "b", pch = 16, ylim = c(0, 1),
      xlab = "Year", ylab = "Capture probability")
@@ -226,22 +226,22 @@ levels. Here a second order random walk is used for day of the year
 (`doy`).
 
 ``` r
-days <- min(ef_data$doy):max(ef_data$doy)
-ef_data$fdoy <- factor(ef_data$doy, levels = days)
+days <- min(ef2_data$doy):max(ef2_data$doy)
+ef2_data$fdoy <- factor(ef2_data$doy, levels = days)
 rw2 <- rw_penalty(days, order = 2)
 
 m1_doy <-
   efp2(
     count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) +
       pass12 + lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 ```
 
     ## 
     ## Call:
     ## efp2(formula = count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
-    ##     pass12 + lifestage, data = ef_data, pass = pass, id = sampleID)
+    ##     pass12 + lifestage, data = ef2_data, pass = pass, id = sampleID)
     ## 
     ## Formula:
     ## count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
@@ -279,7 +279,7 @@ plot(days, plogis(pred$fit), type = "l", ylim = c(0, 1),
      xlab = "Day of year", ylab = "Capture probability")
 lines(days, plogis(pred$fit - 2 * pred$se.fit), lty = 2)
 lines(days, plogis(pred$fit + 2 * pred$se.fit), lty = 2)
-rug(ef_data$doy)
+rug(ef2_data$doy)
 ```
 
 <img src="man/figures/README-smooth-doy-1.png" alt="Line plot of capture probability by day of the year from a second order random walk, with 95% confidence intervals"  />
@@ -297,26 +297,26 @@ multi-pass then can just use fitted values. However, if you want P for
 both single and multi-pass data then predict to the new dataframe
 
 ``` r
-ef_data$prob <- predict(m1, newdata = ef_data, type = "response")
+ef2_data$prob <- predict(m1, newdata = ef2_data, type = "response")
 ```
 
 Standard errors of the predictions are available using `se.fit = TRUE`.
 To use the plotting and prediction tools in `mgcv` the model can also be
-converted to a gam object using `as.gam(m1)`.
+converted to a gam object using `as.gam2(m1)`.
 
 # Obtain Cumulative Estimates of *P* (for estimation of densities later)
 
 Aggregate counts by sampleID (i.e. counts of fry or parr per site visit)
 
 ``` r
-counts <- aggregate(count ~ sampleID, ef_data, sum)
+counts <- aggregate(count ~ sampleID, ef2_data, sum)
 ```
 
 Reshape to get capture probability by species x lifestage x site visit x
 pass. This facilitates the summary of *P*.
 
 ``` r
-probs <- cast(ef_data, formula = sampleID ~ pass, value = "prob")
+probs <- cast(ef2_data, formula = sampleID ~ pass, value = "prob")
 ```
 
 Get cumulative capture probability by sampleID (see [Glover *et al*.,
@@ -335,7 +335,7 @@ probs <- select(probs, sampleID, prob)
 Remove pass and pass-specific data from dataframe
 
 ``` r
-densdata <- unique(select(ef_data, -count, -prob, -pass, -pass12))
+densdata <- unique(select(ef2_data, -count, -prob, -pass, -pass12))
 ```
 
 Join data and cumulative counts by sampleID
@@ -382,7 +382,7 @@ adding `s(f, bs = "re")` terms to the formula, where `f` is a factor.
 The sampleID needs to be a factor to be used as a random effect
 
 ``` r
-ef_data$fsampleID <- factor(ef_data$sampleID)
+ef2_data$fsampleID <- factor(ef2_data$sampleID)
 ```
 
 Fit a model with visit and sample random effects
@@ -390,7 +390,7 @@ Fit a model with visit and sample random effects
 ``` r
 mfull <- efp2(count ~ siteID + year + lifestage + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
-             data = ef_data, pass = pass, id = sampleID)
+             data = ef2_data, pass = pass, id = sampleID)
 
 mfull
 ```
@@ -398,7 +398,7 @@ mfull
     ## 
     ## Call:
     ## efp2(formula = count ~ siteID + year + lifestage + pass12 + s(visitID, 
-    ##     bs = "re") + s(fsampleID, bs = "re"), data = ef_data, pass = pass, 
+    ##     bs = "re") + s(fsampleID, bs = "re"), data = ef2_data, pass = pass, 
     ##     id = sampleID)
     ## 
     ## Formula:
@@ -451,7 +451,7 @@ AIC(mfull)
 ``` r
 mlife <- efp2(count ~ siteID + year + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
-             data = ef_data, pass = pass, id = sampleID)
+             data = ef2_data, pass = pass, id = sampleID)
 
 AIC(mlife)
 ```

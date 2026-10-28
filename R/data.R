@@ -19,4 +19,4 @@
 #' }
 #'
 #' @source \url{https://www.gov.scot/publications/scotland-river-temperature-monitoring-network-srtmn/}
-"ef_data"
+"ef2_data"

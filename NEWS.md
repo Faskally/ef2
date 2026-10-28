@@ -9,6 +9,8 @@
 * `efp()` is renamed `efp2()`, so ef and ef2 can be attached together
 * remove `logit()`, `invlogit()` and `transpar()`, use `qlogis()` and
   `plogis()` from stats instead
+* `as.gam()` is renamed `as.gam2()` and `ef_data` is renamed `ef2_data`,
+  so no names clash with ef
 
 # ef 2.0.0 (2026-10-09)
 

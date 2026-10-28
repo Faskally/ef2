@@ -14,10 +14,10 @@ reference:
   contents:
   - predict.efp2
   - efp2-methods
-  - as.gam
+  - as.gam2
 - title: Data
   contents:
-  - ef_data
+  - ef2_data
 - title: Package
   contents:
   - ef2-package

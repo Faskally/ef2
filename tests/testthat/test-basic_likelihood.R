@@ -54,29 +54,29 @@ test_that("single sample, 3 pass, constant p", {
 
 test_that("simple model fits", {
 
-  data(ef_data)
+  data(ef2_data)
 
-  ef_data$pass12 <- factor(replace(ef_data$pass, ef_data$pass > 2, 2))
+  ef2_data$pass12 <- factor(replace(ef2_data$pass, ef2_data$pass > 2, 2))
 
-  ef_data$sampleID <-
+  ef2_data$sampleID <-
     as.numeric(factor(paste(
-      ef_data$date, ef_data$siteID,
-      ef_data$lifestage, ef_data$species
+      ef2_data$date, ef2_data$siteID,
+      ef2_data$lifestage, ef2_data$species
     )))
 
-  ef_data$visitID <- as.numeric(factor(paste(ef_data$date, ef_data$siteID)))
+  ef2_data$visitID <- as.numeric(factor(paste(ef2_data$date, ef2_data$siteID)))
 
 
   m1 <- efp2(count ~ 1,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   m2 <- efp2(count ~ lifestage + pass12,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   m3 <- efp2(count ~ lifestage + pass + year,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   expect_equivalent(coef(m1), 0.9734342, tolerance = 1e-5)
@@ -94,26 +94,26 @@ test_that("simple model fits", {
 })
 
 test_that("random effects likelihood", {
-  data(ef_data)
-  ef_data$sampleID <-
+  data(ef2_data)
+  ef2_data$sampleID <-
     factor(paste(
-      ef_data$date, ef_data$siteID,
-      ef_data$lifestage, ef_data$species
+      ef2_data$date, ef2_data$siteID,
+      ef2_data$lifestage, ef2_data$species
     ))
-  ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
+  ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
 
   efdat <-
     efp2(
       count ~ lifestage + s(visitID, bs = "re") + s(sampleID, bs = "re"),
-      data = ef_data, pass = pass, id = sampleID,
+      data = ef2_data, pass = pass, id = sampleID,
       fit = FALSE
     )
 
   expect_equal(ncol(efdat$X), 2)
-  expect_equal(ncol(efdat$Z), nlevels(ef_data$visitID) + nlevels(ef_data$sampleID))
+  expect_equal(ncol(efdat$Z), nlevels(ef2_data$visitID) + nlevels(ef2_data$sampleID))
   expect_equal(
     efdat$re_id,
-    rep(1:2, c(nlevels(ef_data$visitID), nlevels(ef_data$sampleID)))
+    rep(1:2, c(nlevels(ef2_data$visitID), nlevels(ef2_data$sampleID)))
   )
 
   set.seed(1)
@@ -138,24 +138,24 @@ test_that("random effects likelihood", {
 
 
 test_that("visit and sample random effects fit", {
-  data(ef_data)
-  ef_data$sampleID <-
+  data(ef2_data)
+  ef2_data$sampleID <-
     factor(paste(
-      ef_data$date, ef_data$siteID,
-      ef_data$lifestage, ef_data$species
+      ef2_data$date, ef2_data$siteID,
+      ef2_data$lifestage, ef2_data$species
     ))
-  ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
+  ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
 
   m0 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   m1 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   m2 <- efp2(count ~ lifestage + s(visitID, bs = "re") + s(sampleID, bs = "re"),
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   expect_equal(m1$convergence, 0)
@@ -169,10 +169,10 @@ test_that("visit and sample random effects fit", {
   expect_equal(names(m1$sigma), "s(visitID)")
   expect_equal(names(m2$sigma), c("s(visitID)", "s(sampleID)"))
   expect_true(all(m2$sigma > 0))
-  expect_equal(length(m1$random), nlevels(ef_data$visitID))
+  expect_equal(length(m1$random), nlevels(ef2_data$visitID))
   expect_equal(
     length(m2$random),
-    nlevels(ef_data$visitID) + nlevels(ef_data$sampleID)
+    nlevels(ef2_data$visitID) + nlevels(ef2_data$sampleID)
   )
 
   # models are nested, so the marginal likelihood can not decrease
@@ -197,55 +197,55 @@ test_that("visit and sample random effects fit", {
 })
 
 test_that("gam conversion", {
-  data(ef_data)
-  ef_data$sampleID <-
+  data(ef2_data)
+  ef2_data$sampleID <-
     factor(paste(
-      ef_data$date, ef_data$siteID,
-      ef_data$lifestage, ef_data$species
+      ef2_data$date, ef2_data$siteID,
+      ef2_data$lifestage, ef2_data$species
     ))
-  ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
+  ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
 
   m1 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
   m2 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
-  m1_gam <- suppressMessages(as.gam(m1))
-  m2_gam <- suppressMessages(as.gam(m2))
+  m1_gam <- suppressMessages(as.gam2(m1))
+  m2_gam <- suppressMessages(as.gam2(m2))
 
   expect_equal(
-    as.vector(predict(m1_gam, newdata = ef_data, type = "response")),
+    as.vector(predict(m1_gam, newdata = ef2_data, type = "response")),
     fitted(m1)
   )
   expect_equal(
-    as.vector(predict(m2_gam, newdata = ef_data, type = "response")),
+    as.vector(predict(m2_gam, newdata = ef2_data, type = "response")),
     fitted(m2)
   )
 })
 
 test_that("prediction", {
-  data(ef_data)
-  ef_data$sampleID <-
+  data(ef2_data)
+  ef2_data$sampleID <-
     factor(paste(
-      ef_data$date, ef_data$siteID,
-      ef_data$lifestage, ef_data$species
+      ef2_data$date, ef2_data$siteID,
+      ef2_data$lifestage, ef2_data$species
     ))
-  ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
+  ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
 
   m1 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
   m2 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   # predictions for the fitted data are the fitted values
   expect_equal(as.vector(predict(m1, type = "response")), fitted(m1))
   expect_equal(as.vector(predict(m2, type = "response")), fitted(m2))
   expect_equal(
-    as.vector(predict(m2, newdata = ef_data, type = "response")),
+    as.vector(predict(m2, newdata = ef2_data, type = "response")),
     fitted(m2)
   )
   expect_equal(as.vector(predict(m1)), qlogis(fitted(m1)))
@@ -275,13 +275,13 @@ test_that("prediction", {
 
   # offsets are included in predictions for the fitted data
   m3 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID,
-    offset = rep(0.1, nrow(ef_data))
+    data = ef2_data, pass = pass, id = sampleID,
+    offset = rep(0.1, nrow(ef2_data))
   )
   expect_equal(as.vector(predict(m3, type = "response")), fitted(m3))
 
   m4 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID, hessian = FALSE
+    data = ef2_data, pass = pass, id = sampleID, hessian = FALSE
   )
   expect_error(predict(m4, se.fit = TRUE), "hessian = TRUE")
 })
@@ -295,17 +295,17 @@ test_that("pass probabilities", {
 })
 
 test_that("unpenalised smooth terms", {
-  data(ef_data)
-  ef_data$sampleID <-
+  data(ef2_data)
+  ef2_data$sampleID <-
     factor(paste(
-      ef_data$date, ef_data$siteID,
-      ef_data$lifestage, ef_data$species
+      ef2_data$date, ef2_data$siteID,
+      ef2_data$lifestage, ef2_data$species
     ))
   m0 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
   m1 <- efp2(count ~ lifestage + s(doy, k = 3, fx = TRUE),
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   expect_equal(m1$convergence, 0)
@@ -317,12 +317,12 @@ test_that("unpenalised smooth terms", {
 
   # predictions agree with the fitted values, and with the gam conversion
   expect_equal(
-    as.vector(predict(m1, newdata = ef_data, type = "response")),
+    as.vector(predict(m1, newdata = ef2_data, type = "response")),
     fitted(m1)
   )
-  m1_gam <- suppressMessages(as.gam(m1))
+  m1_gam <- suppressMessages(as.gam2(m1))
   expect_equal(
-    as.vector(predict(m1_gam, newdata = ef_data, type = "response")),
+    as.vector(predict(m1_gam, newdata = ef2_data, type = "response")),
     fitted(m1)
   )
 
@@ -334,19 +334,19 @@ test_that("unpenalised smooth terms", {
 })
 
 test_that("methods", {
-  data(ef_data)
-  ef_data$sampleID <-
+  data(ef2_data)
+  ef2_data$sampleID <-
     factor(paste(
-      ef_data$date, ef_data$siteID,
-      ef_data$lifestage, ef_data$species
+      ef2_data$date, ef2_data$siteID,
+      ef2_data$lifestage, ef2_data$species
     ))
-  ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
+  ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
 
   m1 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
   m2 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 
   expect_equal(vcov(m1), m1$Vb)
@@ -363,8 +363,8 @@ test_that("methods", {
 
   expect_equal(attr(logLik(m1), "df"), 2)
   expect_equal(attr(logLik(m2), "df"), 3)
-  expect_equal(nobs(m2), nrow(ef_data))
-  expect_equal(BIC(m2), -2 * m2$llik + log(nrow(ef_data)) * 3)
+  expect_equal(nobs(m2), nrow(ef2_data))
+  expect_equal(BIC(m2), -2 * m2$llik + log(nrow(ef2_data)) * 3)
 
   s1 <- summary(m1)
   s2 <- summary(m2)
@@ -385,7 +385,7 @@ test_that("methods", {
   expect_error(plot(m1), "not available")
 
   m3 <- efp2(count ~ lifestage,
-    data = ef_data, pass = pass, id = sampleID, hessian = FALSE
+    data = ef2_data, pass = pass, id = sampleID, hessian = FALSE
   )
   expect_error(vcov(m3), "hessian = TRUE")
 })

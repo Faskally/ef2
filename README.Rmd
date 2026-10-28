@@ -46,7 +46,7 @@ library(mgcv)
 library(dplyr)
 library(reshape)
 library(lattice)
-data(ef_data)
+data(ef2_data)
 ```
 
 # Create Required Fields for Analysis
@@ -55,16 +55,16 @@ data(ef_data)
 Create a factor for pass with separate levels for the first and subsequent passes. NOTE: Assuming the second and third pass have the same capture probability avoids problems with model identifiability ([Millar _et al_., 2016](https://doi.org/10.1016/j.fishres.2016.01.001))
 
 ```{r}
-ef_data$pass12 <- factor(replace(ef_data$pass, ef_data$pass > 2, 2))
+ef2_data$pass12 <- factor(replace(ef2_data$pass, ef2_data$pass > 2, 2))
 ```
 
 Create a sampleID for grouping EF counts together. A sample is a unique combination of site visit x species x lifestage and is required by the EF function
 
 ```{r}
-ef_data$sampleID <-
+ef2_data$sampleID <-
   as.numeric(
     factor(
-      paste(ef_data$date, ef_data$siteID, ef_data$lifestage, ef_data$species)
+      paste(ef2_data$date, ef2_data$siteID, ef2_data$lifestage, ef2_data$species)
     )
   )
 ```
@@ -72,12 +72,12 @@ ef_data$sampleID <-
 Create a visitID for unique site visits. This is used to include between visit variation as a random effect (see below).
 
 ```{r}
-ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
+ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
 ```
 
 Create a factor for year
 ```{r}
-ef_data$fyear <- factor(ef_data$year)
+ef2_data$fyear <- factor(ef2_data$year)
 ```
 
 # Fit a Model
@@ -89,7 +89,7 @@ Fit a simple model. This contains a factor for pass (2 levels), lifestage (2 lev
 m1 <-
   efp2(
     count ~ siteID + fyear + pass12 + lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 ```
 ```{r echo = FALSE}
@@ -110,13 +110,13 @@ The recommended smooths are first and second order random walks. These use the M
 The covariate must be a factor whose levels are the steps of the walk, in order. Here the year factor is replaced by a first order random walk over years.
 
 ```{r results = 'hide', warning = FALSE, message = FALSE}
-rw1 <- rw_penalty(levels(ef_data$fyear), order = 1)
+rw1 <- rw_penalty(levels(ef2_data$fyear), order = 1)
 
 m1_smooth <-
   efp2(
     count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) +
       pass12 + lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 ```
 ```{r echo = FALSE}
@@ -131,10 +131,10 @@ The smooth effect of year on capture probability, here for the first pass for fr
 newdata <-
   data.frame(
     siteID = "Site1", pass12 = "1", lifestage = "Fry",
-    fyear = factor(levels(ef_data$fyear), levels = levels(ef_data$fyear))
+    fyear = factor(levels(ef2_data$fyear), levels = levels(ef2_data$fyear))
   )
 pred <- predict(m1_smooth, newdata = newdata, se.fit = TRUE)
-year <- as.numeric(levels(ef_data$fyear))
+year <- as.numeric(levels(ef2_data$fyear))
 
 plot(year, plogis(pred$fit), type = "b", pch = 16, ylim = c(0, 1),
      xlab = "Year", ylab = "Capture probability")
@@ -151,15 +151,15 @@ AIC(m1, m1_smooth)
 A random walk can have steps with no data, for example a walk over every day of the year when sites were only fished on some of them. All the steps are included in the penalty, and the factor is given the same levels. Here a second order random walk is used for day of the year (`doy`).
 
 ```{r results = 'hide', warning = FALSE, message = FALSE}
-days <- min(ef_data$doy):max(ef_data$doy)
-ef_data$fdoy <- factor(ef_data$doy, levels = days)
+days <- min(ef2_data$doy):max(ef2_data$doy)
+ef2_data$fdoy <- factor(ef2_data$doy, levels = days)
 rw2 <- rw_penalty(days, order = 2)
 
 m1_doy <-
   efp2(
     count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) +
       pass12 + lifestage,
-    data = ef_data, pass = pass, id = sampleID
+    data = ef2_data, pass = pass, id = sampleID
   )
 ```
 ```{r echo = FALSE}
@@ -180,7 +180,7 @@ plot(days, plogis(pred$fit), type = "l", ylim = c(0, 1),
      xlab = "Day of year", ylab = "Capture probability")
 lines(days, plogis(pred$fit - 2 * pred$se.fit), lty = 2)
 lines(days, plogis(pred$fit + 2 * pred$se.fit), lty = 2)
-rug(ef_data$doy)
+rug(ef2_data$doy)
 ```
 
 Any other penalised smooth from `mgcv` can be used, for example `s(doy)` or `te(doy, area)`, but their penalties are not sparse so they take longer to fit. An unpenalised regression spline, whose flexibility is set by its basis dimension `k`, can be fitted using `fx = TRUE`, for example `s(doy, k = 3, fx = TRUE)`.
@@ -192,10 +192,10 @@ Any other penalised smooth from `mgcv` can be used, for example `s(doy)` or `te(
 Predict _P_ from the model to the full dataset. Note, if all the data is multi-pass then can just use fitted values. However, if you want P for both single and multi-pass data then predict to the new dataframe
 
 ```{r}
-ef_data$prob <- predict(m1, newdata = ef_data, type = "response")
+ef2_data$prob <- predict(m1, newdata = ef2_data, type = "response")
 ```
 
-Standard errors of the predictions are available using `se.fit = TRUE`. To use the plotting and prediction tools in `mgcv` the model can also be converted to a gam object using `as.gam(m1)`.
+Standard errors of the predictions are available using `se.fit = TRUE`. To use the plotting and prediction tools in `mgcv` the model can also be converted to a gam object using `as.gam2(m1)`.
 
 
 # Obtain Cumulative Estimates of _P_ (for estimation of densities later)
@@ -204,13 +204,13 @@ Standard errors of the predictions are available using `se.fit = TRUE`. To use t
 Aggregate counts by sampleID (i.e. counts of fry or parr per site visit)
 
 ```{r}
-counts <- aggregate(count ~ sampleID, ef_data, sum)
+counts <- aggregate(count ~ sampleID, ef2_data, sum)
 ```
 
 Reshape to get capture probability by species x lifestage x site visit x pass. This facilitates the summary of _P_.
 
 ```{r results = 'hide', warning = FALSE, message = FALSE}
-probs <- cast(ef_data, formula = sampleID ~ pass, value = "prob")
+probs <- cast(ef2_data, formula = sampleID ~ pass, value = "prob")
 ```
 
 Get cumulative capture probability by sampleID (see [Glover _et al_., 2018](https://doi.org/10.1016/j.ecolind.2018.05.013))
@@ -228,7 +228,7 @@ probs <- select(probs, sampleID, prob)
 Remove pass and pass-specific data from dataframe
 
 ```{r}
-densdata <- unique(select(ef_data, -count, -prob, -pass, -pass12))
+densdata <- unique(select(ef2_data, -count, -prob, -pass, -pass12))
 ```
 
 Join data and cumulative counts by sampleID
@@ -279,7 +279,7 @@ Electrofishing count data are typically overdispersed: capture probability varie
 The sampleID needs to be a factor to be used as a random effect
 
 ```{r}
-ef_data$fsampleID <- factor(ef_data$sampleID)
+ef2_data$fsampleID <- factor(ef2_data$sampleID)
 ```
 
 Fit a model with visit and sample random effects
@@ -287,7 +287,7 @@ Fit a model with visit and sample random effects
 ```{r}
 mfull <- efp2(count ~ siteID + year + lifestage + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
-             data = ef_data, pass = pass, id = sampleID)
+             data = ef2_data, pass = pass, id = sampleID)
 
 mfull
 ```
@@ -311,7 +311,7 @@ AIC(mfull)
 ```{r}
 mlife <- efp2(count ~ siteID + year + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
-             data = ef_data, pass = pass, id = sampleID)
+             data = ef2_data, pass = pass, id = sampleID)
 
 AIC(mlife)
 ```

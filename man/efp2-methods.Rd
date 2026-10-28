@@ -87,10 +87,10 @@ Residuals, analysis of deviance tables and diagnostic plots are not
 available for efp2 fits, and the corresponding methods return an error.
 }
 \examples{
-data(ef_data)
-ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
-                                 ef_data$lifestage, ef_data$species))
-m1 <- efp2(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
+data(ef2_data)
+ef2_data$sampleID <- factor(paste(ef2_data$date, ef2_data$siteID,
+                                 ef2_data$lifestage, ef2_data$species))
+m1 <- efp2(count ~ lifestage, data = ef2_data, pass = pass, id = sampleID)
 
 summary(m1)
 vcov(m1)

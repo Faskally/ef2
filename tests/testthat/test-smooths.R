@@ -129,7 +129,7 @@ test_that("random walk smooths fit", {
     expect_true(all(pred$se.fit > 0 & pred$se.fit < 0.1))
     expect_equal(dim(m$Vp), rep(ncol(m$Gfit), 2))
 
-    m_gam <- suppressMessages(as.gam(m))
+    m_gam <- suppressMessages(as.gam2(m))
     expect_equal(
       as.vector(predict(m_gam, newdata = data, type = "response")),
       fitted(m)
