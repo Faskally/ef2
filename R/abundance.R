@@ -122,8 +122,10 @@ capture_prob_parts <- function(object, newdata = NULL, gradient = FALSE) {
 #' \eqn{T + \hat\lambda (1 - \hat P)}. Given the parameters, the number not
 #' caught is Poisson with mean \eqn{\lambda (1 - P)}, and its variance is
 #' combined with the uncertainty in \eqn{\hat\lambda} and \eqn{\hat P}, using
-#' the joint covariance matrix of the two models. The confidence interval is
-#' computed for the number not caught on the log scale, and the catch added.
+#' the joint covariance matrix of the two models. The confidence interval for
+#' the number not caught uses the quantiles of a negative binomial
+#' distribution with this mean and variance, since it is a count that is
+#' often zero, and the catch is added.
 #' The expected abundance is \eqn{\hat\lambda}. Estimates are available for
 #' samples with a zero catch.
 #'

@@ -6,8 +6,10 @@
 # if it is negative binomial. The estimate is T + M_hat, and the variance
 # of M combines its variance given the parameters with the uncertainty in
 # lambda, P and theta, from the joint covariance matrix of the parameters
-# of the two models. Confidence intervals are computed for M
-# on the log scale, so the lower limit is at least the catch.
+# of the two models. Confidence intervals for M use the quantiles of a
+# negative binomial with this mean and variance, as M is a count that is
+# often zero, and the catch is added, so the lower limit is at least the
+# catch.
 #
 # The expected abundance is lambda, with confidence intervals on the log
 # scale.
@@ -106,10 +108,19 @@ abundance_efn2 <- function(object, newdata = NULL, area = NULL, by = NULL,
 
   z <- qnorm(1 - (1 - level) / 2)
   if (target == "realised") {
+    # the number not caught is a count, often zero when capture probability
+    # is high, so the interval uses the quantiles of a negative binomial
+    # with its mean and variance, or a Poisson if the variance is less than
+    # the mean
     M <- out$N - out$catch
-    cv <- out$se / M
-    out$lower <- out$catch + M * exp(-z * cv)
-    out$upper <- out$catch + M * exp(z * cv)
+    V <- out$se^2
+    alpha <- (1 - level) / 2
+    size <- ifelse(V > M, M^2 / (V - M), Inf)
+    q <- function(p) {
+      ifelse(is.finite(size), stats::qnbinom(p, size = size, mu = M), stats::qpois(p, M))
+    }
+    out$lower <- out$catch + q(alpha)
+    out$upper <- out$catch + q(1 - alpha)
   } else {
     cv <- out$se / out$N
     out$lower <- out$N * exp(-z * cv)
