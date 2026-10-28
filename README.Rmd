@@ -6,7 +6,7 @@ output:
     html_preview: false
 ---
 
-[![R-CMD-check](https://github.com/Faskally/ef/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Faskally/ef/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/Faskally/ef2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Faskally/ef2/actions/workflows/R-CMD-check.yaml)
 
 ## the model
 
@@ -30,18 +30,18 @@ Fish density is then estimated by dividing the total catch by the area fished an
 
 To install the `ef` package from r-universe run
 ```r
-install.packages("ef", repos = c('https://faskally.r-universe.dev', 'https://cloud.r-project.org'))
+install.packages("ef2", repos = c('https://faskally.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 or to install the latest development version from GitHub run
 ```r
-remotes::install_github("faskally/ef")
+remotes::install_github("faskally/ef2")
 ```
 
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(fig.path = "man/figures/README-")
-library(ef)
+library(ef2)
 library(mgcv)
 library(dplyr)
 library(reshape)

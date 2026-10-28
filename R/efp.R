@@ -404,6 +404,6 @@ efp <- function(formula, data = NULL, pass = pass, id = id,
   out$Gsetup <- Gsetup
   out$convergence <- opt$convergence
 
-  class(out) <- c("efp", "glm", "lm")
+  class(out) <- c("efp2", "glm", "lm")
   out
 }

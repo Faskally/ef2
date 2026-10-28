@@ -12,7 +12,7 @@ read_shared("simulate.R")
 This worked example adds smooth effects of year and day of the year to a model with visit and sample random effects. It shows how to set up random walk smooths, how to choose between models, and how to plot the estimated effects.
 
 ```{r}
-library(ef)
+library(ef2)
 ```
 
 ## The data

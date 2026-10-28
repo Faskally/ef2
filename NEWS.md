@@ -1,3 +1,8 @@
+# ef2 2.0.0
+
+* package renamed from ef to ef2 so it can be installed alongside ef 1.x;
+  fitted models now have class `efp2`
+
 # ef 2.0.0 (2026-10-09)
 
 * move likelihood computation to RTMB, the package no longer has compiled code

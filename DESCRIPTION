@@ -1,4 +1,4 @@
-Package: ef
+Package: ef2
 Title: Modelling Framework for the Estimation of Salmonid Abundance
 Version: 2.0.0
 Date: 2026-10-09
@@ -17,8 +17,8 @@ Description: Estimates capture probabilities and densities from multipass
   effects, for example for between visit and between sample variation. The
   likelihood is computed using 'RTMB', with random effects integrated out
   using the Laplace approximation.
-URL: https://faskally.github.io/ef/, https://github.com/Faskally/ef
-BugReports: https://github.com/Faskally/ef/issues
+URL: https://faskally.github.io/ef2/, https://github.com/Faskally/ef2
+BugReports: https://github.com/Faskally/ef2/issues
 Depends: R (>= 4.1.0)
 Imports: Matrix, RTMB, methods, mgcv
 Suggests: testthat (>= 3.0.0)

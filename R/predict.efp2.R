@@ -43,7 +43,7 @@
 #' @importFrom stats predict model.frame model.matrix delete.response
 #' @importFrom mgcv PredictMat
 #' @export
-predict.efp <- function(object, newdata = NULL,
+predict.efp2 <- function(object, newdata = NULL,
   type = c("link", "response", "lpmatrix"), se.fit = FALSE,
   exclude = NULL, ...) {
 

@@ -1,4 +1,4 @@
 library(testthat)
-library(ef)
+library(ef2)
 
-test_check("ef")
+test_check("ef2")

@@ -32,7 +32,7 @@
 #'   \code{confint} a matrix with columns giving the lower and upper
 #'   confidence limits; \code{logLik} an object of class \code{logLik};
 #'   \code{formula} the model formula; \code{summary} an object of class
-#'   \code{summary.efp}, a list containing the coefficient table
+#'   \code{summary.efp2}, a list containing the coefficient table
 #'   (\code{coefficients}) and the table of random effect standard
 #'   deviations (\code{sigma}). The \code{print} methods return their
 #'   argument invisibly.
@@ -54,7 +54,7 @@ NULL
 
 #' @rdname efp-methods
 #' @export
-vcov.efp <- function(object, ...) {
+vcov.efp2 <- function(object, ...) {
   if (!is.matrix(object$Vb)) {
     stop("the variance matrix is not available: refit the model with hessian = TRUE")
   }
@@ -64,13 +64,13 @@ vcov.efp <- function(object, ...) {
 #' @rdname efp-methods
 #' @importFrom stats confint.default logLik
 #' @export
-confint.efp <- function(object, parm, level = 0.95, ...) {
+confint.efp2 <- function(object, parm, level = 0.95, ...) {
   confint.default(object, parm, level = level, ...)
 }
 
 #' @rdname efp-methods
 #' @export
-logLik.efp <- function(object, ...) {
+logLik.efp2 <- function(object, ...) {
   structure(
     object$llik,
     df = object$rank, nobs = nrow(object$G), class = "logLik"
@@ -79,14 +79,14 @@ logLik.efp <- function(object, ...) {
 
 #' @rdname efp-methods
 #' @export
-formula.efp <- function(x, ...) {
+formula.efp2 <- function(x, ...) {
   x$formula
 }
 
 #' @rdname efp-methods
-#' @method summary efp
-#' @exportS3Method summary efp
-summary.efp <- function(object, ...) {
+#' @method summary efp2
+#' @exportS3Method summary efp2
+summary.efp2 <- function(object, ...) {
   out <- object[c("call", "formula", "aic", "df.null", "df.residual", "convergence")]
   out$logLik <- logLik(object)
 
@@ -102,14 +102,14 @@ summary.efp <- function(object, ...) {
     out$sigma <- re
   }
 
-  class(out) <- "summary.efp"
+  class(out) <- "summary.efp2"
   out
 }
 
 #' @rdname efp-methods
-#' @method print summary.efp
-#' @exportS3Method print summary.efp
-print.summary.efp <- function(x, digits = max(3L, getOption("digits") - 3L),  ...) {
+#' @method print summary.efp2
+#' @exportS3Method print summary.efp2
+print.summary.efp2 <- function(x, digits = max(3L, getOption("digits") - 3L),  ...) {
 
   cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
     "\n\n",
@@ -150,18 +150,18 @@ print.summary.efp <- function(x, digits = max(3L, getOption("digits") - 3L),  ..
 
 #' @rdname efp-methods
 #' @export
-residuals.efp <- function(object, ...) {
+residuals.efp2 <- function(object, ...) {
   stop("residuals are not available for efp fits")
 }
 
 #' @rdname efp-methods
 #' @export
-anova.efp <- function(object, ...) {
+anova.efp2 <- function(object, ...) {
   stop("anova is not available for efp fits, models can be compared using AIC")
 }
 
 #' @rdname efp-methods
 #' @export
-plot.efp <- function(x, ...) {
+plot.efp2 <- function(x, ...) {
   stop("plot is not available for efp fits, see as.gam for plotting model terms")
 }

@@ -12,7 +12,7 @@ read_shared("simulate.R")
 This article simulates a multipass electrofishing dataset in which everything about capture probability is known: the effects of lifestage and pass, smooth effects of year and day of the year, and random variation between visits and between samples. The same dataset is used in the worked examples on [random effects](random-effects.html) and [smooth terms](smooth-terms.html), where the models are checked against the values used here.
 
 ```{r}
-library(ef)
+library(ef2)
 ```
 
 ## The sampling design

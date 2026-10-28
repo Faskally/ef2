@@ -4,7 +4,7 @@
 #' from multipass removal (electrofishing) data. The main function is
 #' \code{\link{efp}}, which fits a model for capture probability, and
 #' predictions of capture probability are available from
-#' \code{\link{predict.efp}}.
+#' \code{\link{predict.efp2}}.
 #'
 #' @references
 #' Millar, C. P., Fryer, R. J., Millidine, K. J. and Malcolm, I. A. (2016)
@@ -20,6 +20,6 @@
 #' salmon (Salmo salar) from a long-term electrofishing dataset. Ecological
 #' Indicators, 93, 302-315. \doi{10.1016/j.ecolind.2018.05.013}
 #'
-#' @name ef-package
-#' @aliases ef
+#' @name ef2-package
+#' @aliases ef2
 "_PACKAGE"

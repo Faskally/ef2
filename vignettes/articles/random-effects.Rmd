@@ -12,7 +12,7 @@ read_shared("simulate.R")
 Capture probability usually varies between visits to a site, and between the samples taken on a visit, by more than covariates can explain. This worked example shows how to include that variation using random effects, how to choose between models, and how to look at the estimated effects.
 
 ```{r}
-library(ef)
+library(ef2)
 ```
 
 ## The data

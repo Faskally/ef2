@@ -21,7 +21,7 @@ and effective degrees of freedom in the gam object are not.
 \details{
 The conversion fits a model using \code{mgcv}, which can take a very
 long time if the model has many random effects. Predictions do not need
-the conversion, see \code{\link{predict.efp}}.
+the conversion, see \code{\link{predict.efp2}}.
 }
 \examples{
 data(ef_data)

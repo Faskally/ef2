@@ -1,4 +1,4 @@
-url: https://faskally.github.io/ef/
+url: https://faskally.github.io/ef2/
 
 template:
   bootstrap: 5
@@ -12,7 +12,7 @@ reference:
   - rw_penalty
 - title: Predictions and summaries
   contents:
-  - predict.efp
+  - predict.efp2
   - efp-methods
   - as.gam
 - title: Utilities

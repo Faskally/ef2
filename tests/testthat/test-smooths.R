@@ -71,20 +71,20 @@ test_that("random walk likelihood", {
     steps <- rnorm(k, 0, 0.2)
     beta <- rnorm(order, 0, 0.1)
     expect_equal(
-      ef:::ef_nll(list(alpha = drop(L %*% steps), beta = beta, log_sigma = -1.5), efdat),
-      ef:::ef_nll(list(alpha = steps, beta = beta, log_sigma = -1.5), efdat_steps)
+      ef2:::ef_nll(list(alpha = drop(L %*% steps), beta = beta, log_sigma = -1.5), efdat),
+      ef2:::ef_nll(list(alpha = steps, beta = beta, log_sigma = -1.5), efdat_steps)
     )
 
     # marginal likelihood
     params <- list(alpha = rep(0, k), beta = beta, log_sigma = -1.5)
     obj <-
       RTMB::MakeADFun(
-        function(params) ef:::ef_nll(params, efdat), params,
+        function(params) ef2:::ef_nll(params, efdat), params,
         random = "alpha", silent = TRUE
       )
     obj_steps <-
       RTMB::MakeADFun(
-        function(params) ef:::ef_nll(params, efdat_steps), params,
+        function(params) ef2:::ef_nll(params, efdat_steps), params,
         random = "alpha", silent = TRUE
       )
     expect_equal(obj$fn(obj$par), obj_steps$fn(obj_steps$par), tolerance = 1e-8)

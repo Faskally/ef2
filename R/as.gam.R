@@ -7,7 +7,7 @@
 #'
 #' The conversion fits a model using \code{mgcv}, which can take a very
 #' long time if the model has many random effects. Predictions do not need
-#' the conversion, see \code{\link{predict.efp}}.
+#' the conversion, see \code{\link{predict.efp2}}.
 #'
 #'
 #' @param object an efp fitted model
@@ -29,7 +29,7 @@
 #'
 #' @export
 as.gam <- function(object) {
-  stopifnot(is(object)[1] == "efp")
+  stopifnot(is(object)[1] == "efp2")
   g1 <- efp_gam(object)
 
   # columns of the design matrix that were estimated

@@ -40,7 +40,7 @@ test_that("single sample, 3 pass, constant p", {
 
   obj <-
     RTMB::MakeADFun(
-      function(params) ef:::ef_nll(params, efdat),
+      function(params) ef2:::ef_nll(params, efdat),
       params,
       # map = map,
       inner.control = list(maxit = 500, trace = TRUE)
@@ -125,7 +125,7 @@ test_that("random effects likelihood", {
     )
 
   # joint likelihood of data and random effects
-  nll <- ef:::ef_nll(params, efdat)
+  nll <- ef2:::ef_nll(params, efdat)
 
   efdat_fixed <- efdat
   efdat_fixed$offset <- as.vector(efdat$Z %*% params$alpha)
@@ -368,7 +368,7 @@ test_that("methods", {
 
   s1 <- summary(m1)
   s2 <- summary(m2)
-  expect_s3_class(s2, "summary.efp")
+  expect_s3_class(s2, "summary.efp2")
   expect_equal(unname(s2$coefficients[, "Estimate"]), unname(coef(m2)))
   expect_equal(
     unname(s2$coefficients[, "Std. Error"]),
