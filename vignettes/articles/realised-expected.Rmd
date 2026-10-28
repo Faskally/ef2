@@ -1,0 +1,233 @@
+---
+title: "Realised and expected abundance"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4.5)
+# the simulation code is shared between the articles
+read_shared <- knitr::read_chunk
+read_shared("simulate.R")
+```
+
+Once capture probability has been estimated, the abundance of fish in a sample is estimated by dividing the catch by the cumulative capture probability. There are two different quantities that this estimate can be used for, and they need different confidence intervals:
+
+* the **realised** abundance $N$: the number of fish that were in the area fished when the sample was taken. This answers "how many fish were there?"
+* the **expected** abundance $\lambda$: the mean of the process that produced $N$, for example density times area. This answers "how many fish do we expect at this site?", which is what matters when comparing sites, years or habitats.
+
+`abundance()` gives both, using the `target` argument. This article explains the difference, and uses simulated data to see how well each confidence interval covers its own target. It also shows a limitation: estimated capture probabilities are shrunk towards the average, which biases estimates of abundance downwards, so the confidence intervals cover the truth less often than they should.
+
+```{r}
+library(ef2)
+```
+
+## The theory
+
+For a sample with $n$ passes and capture probability $p_i$ on pass $i$, the cumulative capture probability is $P = 1 - \prod_i (1 - p_i)$, and each fish present is caught on one of the passes with probability $P$. The total catch $T$ is therefore:
+
+* **binomial given the realised abundance**: $T \mid N \sim \textrm{Bin}(N, P)$
+* **Poisson given the expected abundance**, if the number of fish present is Poisson, $N \sim \textrm{Poisson}(\lambda)$: then $T \sim \textrm{Poisson}(\lambda P)$, because catching each fish independently with probability $P$ "thins" a Poisson count into another Poisson count.
+
+In both cases the estimate is the same, $\hat N = \hat\lambda = T / P$, but the variance is not:
+
+| target | variance of $T / P$ given $P$ | lower confidence limit |
+|---|---|---|
+| realised, $N$ | $N (1 - P) / P$ | at least the catch $T$ |
+| expected, $\lambda$ | $\lambda / P$ | can be less than $T$ |
+
+The expected abundance has the larger variance, by a factor of $1 / (1 - P)$, because it also includes the natural variation of $N$ about $\lambda$. When $P$ is high this factor is large: for $P = 0.9$ the variance is ten times larger. This makes sense: if almost every fish is caught, we know almost exactly how many were present, but one sample still says little about how many we would expect on average.
+
+The uncertainty in $P$ adds a second term, which is the same for both targets, $N^2 (1 - P)^2 \textrm{var}(\textrm{logit}(P))$. It is computed from the model, and is correlated between samples because they depend on the same model coefficients, which `abundance()` allows for when it sums abundance over groups of samples.
+
+## The data
+
+The data are simulated, as described in [Simulating electrofishing data](simulating-data.html). There are 30 sites, each visited once a year for 15 years, with a sample of fry and a sample of parr on each visit. The number of fish in each sample was simulated as $N \sim \textrm{Poisson}(\lambda)$, where $\lambda$ is density times area times a site effect, so both targets are known.
+
+<details>
+<summary>Code to simulate the data</summary>
+
+```{r sim-design}
+```
+```{r sim-effects}
+```
+```{r sim-samples}
+```
+```{r sim-passes}
+```
+```{r sim-removal}
+```
+
+</details>
+
+```{r}
+# the expected number of fish in each sample
+samples$lambda <- density[as.character(samples$lifestage)] * samples$area *
+  exp(site_effect[samples$siteID])
+head(samples[c("sampleID", "lifestage", "area", "lambda", "N")])
+```
+
+## Fitting the model
+
+The model has fixed effects for lifestage and pass, smooth effects of year and day of the year, and visit and sample random effects, see [Visit and sample random effects](random-effects.html).
+
+```{r}
+ef_sim$fsampleID <- factor(ef_sim$sampleID)
+m <- efp2(count ~ lifestage + pass12 + s(year, k = 6) + s(doy, k = 6) +
+            s(visitID, bs = "re") + s(fsampleID, bs = "re"),
+          data = ef_sim, pass = pass, id = sampleID)
+```
+
+## Abundance of each sample
+
+The two targets give the same estimates, but different standard errors and confidence intervals:
+
+```{r}
+realised <- abundance(m)
+expected <- abundance(m, target = "expected")
+
+truth <- samples[match(realised$id, samples$sampleID), ]
+head(cbind(realised[c("id", "catch", "P", "N")],
+           se_realised = realised$se, se_expected = expected$se))
+```
+
+The ratio of the standard errors depends on $P$. When $P$ is well estimated it is close to $1 / \sqrt{1 - P}$; the uncertainty in $P$ makes it smaller, as it adds the same amount to both variances:
+
+```{r, fig.alt = "Ratio of the standard errors of expected and realised abundance plotted against cumulative capture probability, increasing steeply as P approaches 1"}
+plot(realised$P, expected$se / realised$se, pch = 16, col = "grey40",
+     xlab = "Cumulative capture probability, P",
+     ylab = "Ratio of standard errors, expected / realised")
+curve(1 / sqrt(1 - x), add = TRUE, lwd = 2)
+legend("topleft", legend = expression(1 / sqrt(1 - P)), lwd = 2, bty = "n")
+```
+
+### Coverage
+
+The proportion of the 95% confidence intervals that contain each target shows which interval answers which question:
+
+```{r}
+covers <- function(ci, x) mean(ci$lower <= x & x <= ci$upper, na.rm = TRUE)
+data.frame(
+  interval = c("realised", "expected"),
+  covers_N = c(covers(realised, truth$N), covers(expected, truth$N)),
+  covers_lambda = c(covers(realised, truth$lambda), covers(expected, truth$lambda))
+)
+```
+
+The realised intervals are far too narrow for the expected abundance, and the expected intervals are wider than they need to be for the realised abundance, so each interval should only be used for its own target. But neither reaches 95% for its own target: the realised intervals contain the realised abundance `r round(100 * covers(realised, truth$N))`% of the time, and the expected intervals contain the expected abundance `r round(100 * covers(expected, truth$lambda))`% of the time. The next section shows why.
+
+The intervals for some parr samples show the difference. The realised intervals are narrow, and never go below the catch; the expected intervals are wider and are centred on the same estimate:
+
+```{r, fig.alt = "Confidence intervals for realised and expected abundance for twelve samples, with the realised and expected numbers of fish marked"}
+show <- which(truth$lifestage == "Parr")[1:12]
+x <- seq_along(show)
+ylim <- range(expected$lower[show], expected$upper[show], truth$N[show], truth$lambda[show])
+ylim[2] <- ylim[2] + 0.35 * diff(ylim) # room for the legend
+plot(x, realised$N[show], ylim = ylim,
+     pch = 16, xaxt = "n", xlab = "Sample", ylab = "Number of fish")
+arrows(x - 0.1, realised$lower[show], x - 0.1, realised$upper[show],
+       angle = 90, code = 3, length = 0.03, lwd = 2, col = "steelblue")
+arrows(x + 0.1, expected$lower[show], x + 0.1, expected$upper[show],
+       angle = 90, code = 3, length = 0.03, lwd = 2, col = "darkorange")
+points(x - 0.1, truth$N[show], pch = 4, col = "steelblue")
+points(x + 0.1, truth$lambda[show], pch = 4, col = "darkorange")
+axis(1, at = x)
+legend("top", bty = "n", ncol = 3, lwd = c(2, 2, NA, NA, NA), pch = c(NA, NA, 4, 4, 16),
+       col = c("steelblue", "darkorange", "steelblue", "darkorange", "black"),
+       legend = c("realised interval", "expected interval", "realised N",
+                  "expected lambda", "estimate"))
+```
+
+## Bias in the estimated capture probability
+
+The simulated capture probabilities are known, so the estimates of $P$ can be compared with the truth:
+
+```{r}
+true_P <- tapply(ef_sim$p, ef_sim$sampleID, function(p) 1 - prod(1 - p))
+cp <- capture_prob(m, se.fit = TRUE)
+cp$true_P <- true_P[as.character(cp$id)]
+
+c(mean_error_logit_P = mean(qlogis(cp$P) - qlogis(cp$true_P)),
+  coverage_P = mean(cp$lower <= cp$true_P & cp$true_P <= cp$upper),
+  total_N_ratio = sum(realised$N) / sum(truth$N))
+```
+
+```{r, fig.alt = "Estimated against true cumulative capture probability on the logit scale, with the points along a flatter line than the line of equality, showing shrinkage towards the average"}
+plot(qlogis(cp$true_P), qlogis(cp$P), pch = 16, col = "grey40",
+     xlab = "True logit(P)", ylab = "Estimated logit(P)")
+abline(0, 1, lwd = 2)
+```
+
+The estimated capture probabilities are shrunk towards the average: those of samples with a low capture probability are overestimated, and those with a high capture probability are underestimated. This is clear when the samples are grouped by their true capture probability:
+
+```{r}
+group <- cut(cp$true_P, quantile(cp$true_P, 0:4 / 4), include.lowest = TRUE,
+             labels = c("lowest", "second", "third", "highest"))
+N_hat <- realised$N
+data.frame(
+  true_P = tapply(cp$true_P, group, function(x) paste(round(range(x), 2), collapse = " to ")),
+  error_logit_P = round(tapply(qlogis(cp$P) - qlogis(cp$true_P), group, mean), 2),
+  estimated_over_true_N = round(tapply(N_hat, group, sum) / tapply(truth$N, group, sum), 3)
+)
+```
+
+Shrinkage is a property of random effects: the estimate of a visit or sample effect is pulled towards zero, more strongly the less information the sample has about it. On its own it would not bias the total, as the errors go both ways. But abundance is the catch divided by $P$, and $1 / P$ is convex: overestimating a low $P$ reduces the estimated abundance by much more than underestimating a high $P$ increases it. Low capture probability samples therefore dominate, and the total estimated abundance is `r round(100 * (1 - sum(realised$N) / sum(truth$N)), 1)`% less than the true total. With the true capture probabilities the total would be unbiased.
+
+Leaving the random effects out does not help: the variation between visits and samples is then not estimated at all, so every sample is shrunk all the way to the average, the total is biased by a similar amount, and the confidence intervals are far too narrow.
+
+The confidence intervals allow for the uncertainty in the random effects on average, so the intervals for $P$ contain the true value `r round(100 * mean(cp$lower <= cp$true_P & cp$true_P <= cp$upper))`% of the time. But they do not allow for the bias of individual samples, which is largest for samples with a low capture probability. The realised intervals for abundance are affected most, because they are narrow when $P$ is high, so a small error in $P$ moves the estimate by more than the width of the interval.
+
+In practice:
+
+* the bias is largest for samples with a low capture probability, and for totals over many samples, where it accumulates while the relative standard error gets smaller;
+* the expected intervals are less affected, as they are wider;
+* anything that gives more information about the capture probability of each sample, such as more passes, or covariates that explain the variation between visits, reduces the shrinkage and the bias.
+
+## Totals over groups of samples
+
+Abundance can be summed over groups of samples using `by`, for example over all sites and lifestages in each year:
+
+```{r}
+year_realised <- abundance(m, by = "year")
+year_expected <- abundance(m, by = "year", target = "expected")
+
+year_truth <- data.frame(
+  year = years,
+  N = tapply(samples$N, samples$year, sum),
+  lambda = tapply(samples$lambda, samples$year, sum)
+)
+head(cbind(year_realised[c("year", "catch", "N", "se")],
+           se_expected = year_expected$se, true_N = year_truth$N,
+           true_lambda = year_truth$lambda))
+```
+
+The site effects are the same in each year, so the expected total is the same every year, while the realised total varies about it. The bias in $P$ accumulates over the samples in each year, so the estimated totals are consistently below the truth, and many of the realised intervals, which are narrow relative to the bias, miss the true totals:
+
+```{r, fig.alt = "Annual totals of realised and expected abundance with confidence intervals, and the true realised and expected totals"}
+yr <- year_realised$year
+ylim <- range(year_expected$lower, year_expected$upper, year_truth$N)
+ylim[2] <- ylim[2] + 0.35 * diff(ylim) # room for the legend
+plot(yr, year_realised$N, type = "n", ylim = ylim,
+     xlab = "Year", ylab = "Total number of fish")
+arrows(yr - 0.1, year_realised$lower, yr - 0.1, year_realised$upper,
+       angle = 90, code = 3, length = 0.03, lwd = 2, col = "steelblue")
+arrows(yr + 0.1, year_expected$lower, yr + 0.1, year_expected$upper,
+       angle = 90, code = 3, length = 0.03, lwd = 2, col = "darkorange")
+points(yr - 0.1, year_truth$N, pch = 4, col = "steelblue")
+lines(yr, year_truth$lambda, col = "darkorange", lty = 2)
+points(yr, year_realised$N, pch = 16)
+legend("top", bty = "n", ncol = 3, lwd = c(2, 2, NA, 1, NA), pch = c(NA, NA, 4, NA, 16),
+       lty = c(1, 1, NA, 2, NA),
+       col = c("steelblue", "darkorange", "steelblue", "darkorange", "black"),
+       legend = c("realised interval", "expected interval", "realised total",
+                  "expected total", "estimate"))
+```
+
+## Which to use
+
+* Use `target = "realised"`, the default, to report how many fish were present when the samples were taken, for example the number of parr in a stretch of river in a given year.
+* Use `target = "expected"` to describe the underlying abundance, for example to compare sites or years, or to look for a trend, where the natural year to year variation in the number of fish is part of the uncertainty.
+
+Modelling the counts directly, for example with a Poisson model for the total catch with offset $\log(A P)$, where $A$ is the area fished, is a model for the expected abundance, as it assumes $T \sim \textrm{Poisson}(\lambda P)$. Such a model treats $P$ as known; `abundance()` with `target = "expected"` includes the uncertainty in $P$.
+
+When the catch is zero the estimated abundance is zero, and the confidence limits are `NA` for both targets.
+
+Whichever target is used, the confidence intervals do not allow for the bias caused by the shrinkage of the estimated capture probabilities, described above, so they should be treated as approximate, particularly for totals over many samples.
