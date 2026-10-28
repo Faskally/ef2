@@ -4,7 +4,14 @@
 \alias{abundance}
 \title{Estimate abundance and density from removal samples}
 \usage{
-abundance(object, newdata = NULL, area = NULL, by = NULL, level = 0.95)
+abundance(
+  object,
+  newdata = NULL,
+  area = NULL,
+  by = NULL,
+  target = c("realised", "expected"),
+  level = 0.95
+)
 }
 \arguments{
 \item{object}{an efp2 fitted model}
@@ -20,6 +27,9 @@ given, density (abundance per unit area) is also returned. With
 \item{by}{an optional character vector of the names of variables in the
 data, which must be the same for all passes of a sample. Abundance is
 summed over the samples with each combination of their values.}
+
+\item{target}{the abundance to estimate, \code{"realised"} (the default)
+or \code{"expected"}, see Details}
 
 \item{level}{the confidence level}
 }
@@ -40,23 +50,43 @@ catch over the passes of a sample and \eqn{P} is the cumulative capture
 probability, see \code{\link{capture_prob}}.
 }
 \details{
-The variance of \eqn{\hat N} combines the binomial sampling variation in
-the catch, given \eqn{P}, and the uncertainty in the estimate of
-\eqn{P} (Huggins, 1989):
+Two targets are available, which have the same estimate but different
+standard errors:
+\describe{
+\item{\code{"realised"}}{the number of fish \eqn{N} present when the
+sample was taken. Given \eqn{N}, the catch is binomial, \eqn{T \sim
+    \textrm{Bin}(N, P)}, and (Huggins, 1989)
 \deqn{\textrm{var}(\hat N) \approx \hat N (1 - P) / P +
-  \hat N^2 (1 - P)^2 \textrm{var}(\textrm{logit}(P)).}
-Confidence intervals are computed on the log scale, and the lower limit
-is not less than the total catch. When the total catch is zero the
-estimated abundance is zero and the confidence limits are \code{NA}.
+      \hat N^2 (1 - P)^2 \textrm{var}(\textrm{logit}(P)).}
+The lower confidence limit is not less than the catch.}
+\item{\code{"expected"}}{the expected number of fish \eqn{\lambda},
+for example density times area, when the number present is
+\eqn{N \sim \textrm{Poisson}(\lambda)}. The catch is then
+\eqn{T \sim \textrm{Poisson}(\lambda P)}, and the first term of the
+variance is \eqn{\hat\lambda / P}, which also includes the natural
+variation of \eqn{N} about \eqn{\lambda}. The standard error is
+larger by a factor of about \eqn{1 / \sqrt{1 - P}} when \eqn{P} is
+well estimated.}
+}
+Use \code{"realised"} to say how many fish were present, and
+\code{"expected"} to describe the underlying abundance, for example
+when comparing sites or years. A Poisson model for the counts with
+offset \eqn{\log(A P)}, where \eqn{A} is the area, is a model for the
+expected abundance.
+
+Confidence intervals are computed on the log scale. When the total catch
+is zero the estimated abundance is zero and the confidence limits are
+\code{NA}.
 
 With \code{by}, abundance is summed over the samples in each group, for
-example over the lifestages caught at a site in a year. The binomial
-variation is independent between samples, but the estimates of \eqn{P}
+example over the lifestages caught at a site in a year. The variation in
+the catches is independent between samples, but the estimates of \eqn{P}
 are correlated, as they depend on the same model coefficients, and this
 is allowed for:
-\deqn{\textrm{var}(\sum_s \hat N_s) \approx \sum_s \hat N_s (1 - P_s) / P_s +
-  w^\top \Sigma w,}
-where \eqn{w_s = \hat N_s (1 - P_s)} and \eqn{\Sigma} is the covariance
+\deqn{\textrm{var}(\sum_s \hat N_s) \approx \sum_s v_s + w^\top \Sigma w,}
+where \eqn{v_s} is \eqn{\hat N_s (1 - P_s) / P_s} for the realised
+abundance and \eqn{\hat N_s / P_s} for the expected abundance,
+\eqn{w_s = \hat N_s (1 - P_s)} and \eqn{\Sigma} is the covariance
 matrix of \eqn{\textrm{logit}(P_s)}.
 }
 \examples{
@@ -70,6 +100,9 @@ head(abundance(m1, area = "area"))
 
 # summed over lifestages for each site and year
 head(abundance(m1, area = "area", by = c("siteID", "year")))
+
+# expected abundance, for comparing years
+abundance(m1, by = "year", target = "expected")
 }
 \references{
 Huggins, R. M. (1989) On the statistical analysis of capture experiments.

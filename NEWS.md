@@ -19,6 +19,8 @@
   probability, abundance and density of each sample with confidence
   intervals, optionally summed over groups of samples with `by`; the
   cumulative capture probability is also reported in `$P`
+* `abundance(target = "expected")` gives confidence intervals for the
+  expected abundance, when the number of fish present is Poisson
 
 # ef 2.0.0 (2026-10-09)
 

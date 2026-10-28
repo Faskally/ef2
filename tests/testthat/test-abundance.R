@@ -199,3 +199,46 @@ test_that("informative errors for summed abundance", {
   # sites have different areas in different years
   expect_error(abundance(m1, by = "siteID", area = "area"), "single area")
 })
+
+test_that("expected abundance", {
+  data <- prep_data()
+  m1 <- efp2(count ~ lifestage + pass12, data = data, pass = pass, id = sampleID)
+  r <- abundance(m1)
+  e <- abundance(m1, target = "expected")
+  cp <- capture_prob(m1, se.fit = TRUE)
+
+  # same estimate, Poisson rather than binomial variance for the counts
+  expect_equal(e$N, r$N)
+  expect_equal(e$se^2, e$N / cp$P + e$N^2 * (1 - cp$P)^2 * cp$se^2)
+  expect_true(all(e$se > r$se))
+  # the lower limit is not truncated at the catch
+  expect_true(any(e$lower < e$catch))
+  expect_equal(e$lower, e$N * exp(-qnorm(0.975) * e$se / e$N))
+
+  # and summed over groups
+  eg <- abundance(m1, by = "year", target = "expected")
+  rg <- abundance(m1, by = "year")
+  expect_equal(eg$N, rg$N)
+  samples <- unique(data[c("sampleID", "year")])
+  year <- samples$year[match(r$id, samples$sampleID)]
+  binom <- tapply(r$N * (1 - cp$P) / cp$P, year, sum)
+  pois <- tapply(e$N / cp$P, year, sum)
+  yr <- as.character(eg$year)
+  expect_equal(eg$se^2 - rg$se^2, as.vector(pois[yr] - binom[yr]))
+
+  expect_error(abundance(m1, target = "other"), "should be one of")
+})
+
+test_that("expected abundance confidence intervals have the nominal coverage", {
+  lambda <- 40
+  sim <- sim_removal(ns = 600, N = lambda, p = 0.35)
+  m <- efp2(n ~ 1, data = sim$data, pass = pass, id = sample)
+  e <- abundance(m, target = "expected")
+  coverage <- mean(e$lower <= lambda & lambda <= e$upper)
+  expect_gt(coverage, 0.9)
+  expect_lt(coverage, 0.99)
+
+  # the realised intervals are too narrow for the expected abundance
+  r <- abundance(m)
+  expect_lt(mean(r$lower <= lambda & lambda <= r$upper), 0.85)
+})
