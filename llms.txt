@@ -629,3 +629,5 @@ can be compared with the truth.
   year](https://faskally.github.io/ef2/articles/smooth-terms.md):
 - [Realised and expected
   abundance](https://faskally.github.io/ef2/articles/realised-expected.md):
+- [Bias in abundance estimates from random effects
+  models](https://faskally.github.io/ef2/articles/abundance-bias.md):
