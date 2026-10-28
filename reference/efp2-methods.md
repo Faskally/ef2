@@ -100,20 +100,20 @@ available for efp2 fits, and the corresponding methods return an error.
 ## Examples
 
 ``` r
-data(ef_data)
-ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
-                                 ef_data$lifestage, ef_data$species))
-m1 <- efp2(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
+data(ef2_data)
+ef2_data$sampleID <- factor(paste(ef2_data$date, ef2_data$siteID,
+                                 ef2_data$lifestage, ef2_data$species))
+m1 <- efp2(count ~ lifestage, data = ef2_data, pass = pass, id = sampleID)
 
 summary(m1)
 #> 
 #> Call:
-#> efp2(formula = count ~ lifestage, data = ef_data, pass = pass, 
+#> efp2(formula = count ~ lifestage, data = ef2_data, pass = pass, 
 #>     id = sampleID)
 #> 
 #> Formula:
 #> count ~ lifestage
-#> <environment: 0x563be476cec0>
+#> <environment: 0x5630a1a1ae78>
 #> 
 #> No random effects
 #> 

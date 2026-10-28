@@ -146,20 +146,20 @@ available for efp2 fits, and the corresponding methods return an error.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ef_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ef_data</span><span class="op">$</span><span class="va">sampleID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">ef_data</span><span class="op">$</span><span class="va">date</span>, <span class="va">ef_data</span><span class="op">$</span><span class="va">siteID</span>,</span></span>
-<span class="r-in"><span>                                 <span class="va">ef_data</span><span class="op">$</span><span class="va">lifestage</span>, <span class="va">ef_data</span><span class="op">$</span><span class="va">species</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span>, data <span class="op">=</span> <span class="va">ef_data</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ef2_data</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ef2_data</span><span class="op">$</span><span class="va">sampleID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">ef2_data</span><span class="op">$</span><span class="va">date</span>, <span class="va">ef2_data</span><span class="op">$</span><span class="va">siteID</span>,</span></span>
+<span class="r-in"><span>                                 <span class="va">ef2_data</span><span class="op">$</span><span class="va">lifestage</span>, <span class="va">ef2_data</span><span class="op">$</span><span class="va">species</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span>, data <span class="op">=</span> <span class="va">ef2_data</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> efp2(formula = count ~ lifestage, data = ef_data, pass = pass, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> efp2(formula = count ~ lifestage, data = ef2_data, pass = pass, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     id = sampleID)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> count ~ lifestage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x563be476cec0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x5630a1a1ae78&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> No random effects</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

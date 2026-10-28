@@ -26,12 +26,12 @@ Estimate capture probability from multipass electrofishing data.
   [`model.matrix(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp2-methods.md)
   [`print(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp2-methods.md)
   : Methods for efp2 fits
-- [`as.gam()`](https://faskally.github.io/ef2/reference/as.gam.md) :
+- [`as.gam2()`](https://faskally.github.io/ef2/reference/as.gam2.md) :
   Conversion of an efp2 fit to a gam fit for plotting
 
 ## Data
 
-- [`ef_data`](https://faskally.github.io/ef2/reference/ef_data.md) :
+- [`ef2_data`](https://faskally.github.io/ef2/reference/ef2_data.md) :
   Counts of salmon fry and parr from electrofishing.
 
 ## Package

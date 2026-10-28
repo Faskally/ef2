@@ -17,3 +17,6 @@
 - remove `logit()`, `invlogit()` and `transpar()`, use
   [`qlogis()`](https://rdrr.io/r/stats/Logistic.html) and
   [`plogis()`](https://rdrr.io/r/stats/Logistic.html) from stats instead
+- `as.gam()` is renamed
+  [`as.gam2()`](https://faskally.github.io/ef2/reference/as.gam2.md) and
+  `ef_data` is renamed `ef2_data`, so no names clash with ef

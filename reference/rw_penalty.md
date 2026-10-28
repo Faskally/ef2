@@ -77,24 +77,24 @@ rw_penalty(1:5, order = 2)
 #> [5,] -0.4472136  6.324555e-01
 
 # a first order random walk over day of the year
-data(ef_data)
-ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
-                                 ef_data$lifestage, ef_data$species))
-days <- min(ef_data$doy):max(ef_data$doy)
-ef_data$fdoy <- factor(ef_data$doy, levels = days)
+data(ef2_data)
+ef2_data$sampleID <- factor(paste(ef2_data$date, ef2_data$siteID,
+                                 ef2_data$lifestage, ef2_data$species))
+days <- min(ef2_data$doy):max(ef2_data$doy)
+ef2_data$fdoy <- factor(ef2_data$doy, levels = days)
 rw1 <- rw_penalty(days)
 
 m1 <- efp2(count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)),
-          data = ef_data, pass = pass, id = sampleID)
+          data = ef2_data, pass = pass, id = sampleID)
 m1
 #> 
 #> Call:
 #> efp2(formula = count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)), 
-#>     data = ef_data, pass = pass, id = sampleID)
+#>     data = ef2_data, pass = pass, id = sampleID)
 #> 
 #> Formula:
 #> count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1))
-#> <environment: 0x563be2d1f910>
+#> <environment: 0x5630a0144dc8>
 #> 
 #> Random effects:
 #>                Estimate Std. Error

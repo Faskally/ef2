@@ -145,7 +145,7 @@ of abundance. Fisheries Research, 177, 1-12.
 
 ``` r
 # create two electrofishing site visits with 3 and 4 passes and 2 lifestages
-ef_data <- data.frame(n      = c(100, 53, 24, 50, 26, 12,
+ef2_data <- data.frame(n      = c(100, 53, 24, 50, 26, 12,
                                  100, 53, 24, 50, 26, 12),
                       pass   = c(  1,  2,  3,  1,  2,  3,
                                    1,  2,  3,  1,  2,  3),
@@ -173,8 +173,8 @@ ef_data3 <- data.frame(n      = c(100, 53, 24, 50, 26, 12, 40,
                                     3,  3,  3,  3,  4,  4,  4, 4, 6))
 
 # Fit a simple model
-m2 <- efp2(n ~ 1 + factor(stage), data = ef_data, pass = pass, id = sample)
-cbind(ef_data, fit = fitted(m2))
+m2 <- efp2(n ~ 1 + factor(stage), data = ef2_data, pass = pass, id = sample)
+cbind(ef2_data, fit = fitted(m2))
 #>      n pass stage sample       fit
 #> 1  100    1     1      1 0.5007603
 #> 2   53    2     1      1 0.5007603
@@ -226,7 +226,7 @@ cbind(ef_data3, fit = fitted(m4))
 #> 16  40    1     2      6 0.5047690
 
 # create two electrofishing site visits with 3 and 4 passes and 2 lifestages
-ef_data <- data.frame(n      = c(200, 53, 24, 100, 26, 12,
+ef2_data <- data.frame(n      = c(200, 53, 24, 100, 26, 12,
                                  200, 53, 24, 100, 26, 12),
                       pass   = c(  1,  2,  3,  1,  2,  3,
                                    1,  2,  3,  1,  2,  3),
@@ -236,8 +236,8 @@ ef_data <- data.frame(n      = c(200, 53, 24, 100, 26, 12,
                                    3,  3,  3,  4,  4,  4))
 # Fit a simple model
 m2 <- efp2(n ~ 1 + factor(stage) + factor(replace(pass, pass> 2, 2)),
-          data = ef_data, pass = pass, id = sample)
-out <- cbind(ef_data, p = fitted(m2, type = "p"))
+          data = ef2_data, pass = pass, id = sample)
+out <- cbind(ef2_data, p = fitted(m2, type = "p"))
 out
 #>      n pass stage sample         p
 #> 1  200    1     1      1 0.6731828
@@ -255,22 +255,22 @@ out
 
 # a smooth effect of a continuous covariate, day of the year, using a
 # second order random walk
-data(ef_data)
-ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
-                                 ef_data$lifestage, ef_data$species))
+data(ef2_data)
+ef2_data$sampleID <- factor(paste(ef2_data$date, ef2_data$siteID,
+                                 ef2_data$lifestage, ef2_data$species))
 #> Error in `$<-.data.frame`(`*tmp*`, sampleID, value = structure(integer(0), levels = character(0), class = "factor")): replacement has 0 rows, data has 12
-ef_data$pass12 <- factor(replace(ef_data$pass, ef_data$pass > 2, 2))
-days <- min(ef_data$doy):max(ef_data$doy)
+ef2_data$pass12 <- factor(replace(ef2_data$pass, ef2_data$pass > 2, 2))
+days <- min(ef2_data$doy):max(ef2_data$doy)
 #> Warning: no non-missing arguments to min; returning Inf
 #> Warning: no non-missing arguments to max; returning -Inf
-#> Error in min(ef_data$doy):max(ef_data$doy): result would be too long a vector
-ef_data$fdoy <- factor(ef_data$doy, levels = days)
+#> Error in min(ef2_data$doy):max(ef2_data$doy): result would be too long a vector
+ef2_data$fdoy <- factor(ef2_data$doy, levels = days)
 #> Error: object 'days' not found
 rw2 <- rw_penalty(days, order = 2)
 #> Error: object 'days' not found
 m5 <- efp2(count ~ siteID + pass12 + lifestage +
             s(fdoy, bs = "mrf", xt = list(penalty = rw2)),
-          data = ef_data, pass = pass, id = sampleID)
+          data = ef2_data, pass = pass, id = sampleID)
 #> Error in eval(id, data, environment(formula)): object 'sampleID' not found
 m5
 #> Error: object 'm5' not found
@@ -286,7 +286,7 @@ cbind(newdata, fit = pred$fit, se = pred$se.fit)
 
 # an unpenalised regression spline
 m6 <- efp2(count ~ siteID + pass12 + lifestage + s(doy, k = 3, fx = TRUE),
-          data = ef_data, pass = pass, id = sampleID)
+          data = ef2_data, pass = pass, id = sampleID)
 #> Error in eval(id, data, environment(formula)): object 'sampleID' not found
 m6
 #> Error: object 'm6' not found
