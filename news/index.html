@@ -46,6 +46,7 @@
 </li>
 <li>models are fitted with <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> rather than <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> (BFGS), which falsely converged on some platforms; <code>control</code> is passed to <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
 </li>
+<li>the likelihood is computed on the log scale, so it stays finite when capture probabilities are close to 0 or 1</li>
 </ul></div>
   </main></div>
 

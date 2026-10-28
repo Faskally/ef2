@@ -9,3 +9,5 @@
   [`optim()`](https://rdrr.io/r/stats/optim.html) (BFGS), which falsely
   converged on some platforms; `control` is passed to
   [`nlminb()`](https://rdrr.io/r/stats/nlminb.html)
+- the likelihood is computed on the log scale, so it stays finite when
+  capture probabilities are close to 0 or 1
