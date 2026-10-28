@@ -112,6 +112,10 @@ ef_nll_joint <- function(params, efdat, ndat) {
   # Poisson total catch, with mean lambda P
   log_mu <- log_lambda + cap$log_P
   nll <- nll - sum(ndat$y * log_mu - exp(log_mu) - lgamma(ndat$y + 1))
+  # the multinomial coefficients, which are left out of the conditional
+  # likelihood, so that this is the log likelihood of independent Poisson
+  # catches on each pass
+  nll <- nll - (sum(lgamma(ndat$y + 1)) - sum(lgamma(efdat$y + 1)))
 
   P <- exp(cap$log_P)
   lambda <- exp(log_lambda)

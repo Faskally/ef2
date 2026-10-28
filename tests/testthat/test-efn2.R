@@ -1,0 +1,108 @@
+prep_efn2_data <- function() {
+  data(ef2_data)
+  ef2_data$pass12 <- factor(pmin(ef2_data$pass, 2))
+  ef2_data$sampleID <- as.numeric(factor(paste(
+    ef2_data$date, ef2_data$siteID, ef2_data$lifestage
+  )))
+  ef2_data$visitID <- factor(paste(ef2_data$date, ef2_data$siteID))
+  ef2_data[order(ef2_data$sampleID, ef2_data$pass), ]
+}
+
+test_that("the joint likelihood is the product of Poisson catches", {
+  data <- prep_efn2_data()
+  dat <- efn2(count ~ lifestage + pass12,
+    abundance = ~ lifestage + offset(log(area)),
+    data = data, pass = pass, id = sampleID, fit = FALSE)
+
+  set.seed(1)
+  params <- list(
+    alpha = numeric(0), beta = c(0.5, 0.3, -0.2), log_sigma = numeric(0),
+    alpha_n = numeric(0), beta_n = c(-1, 0.2), log_sigma_n = numeric(0)
+  )
+  nll <- ef2:::ef_nll_joint(params, dat$efdat, dat$ndat)
+
+  # the same likelihood computed directly
+  X <- model.matrix(~ lifestage + pass12, data)
+  p <- plogis(drop(X %*% params$beta))
+  pi <- ave(p, data$sampleID, FUN = function(x) x * c(1, cumprod(1 - x)[-length(x)]))
+  samples <- data[!duplicated(data$sampleID), ]
+  lambda <- exp(params$beta_n[1] + params$beta_n[2] * (samples$lifestage == "Parr")) *
+    samples$area
+  names(lambda) <- samples$sampleID
+  direct <- -sum(dpois(data$count, lambda[as.character(data$sampleID)] * pi, log = TRUE))
+
+  expect_equal(nll, direct)
+})
+
+test_that("with a separate abundance for each sample the fit is that of efp2", {
+  data <- prep_efn2_data()
+  data$fsample <- factor(data$sampleID)
+  m0 <- efp2(count ~ lifestage + pass12, data = data, pass = pass, id = sampleID)
+  m <- efn2(count ~ lifestage + pass12, abundance = ~ 0 + fsample,
+    data = data, pass = pass, id = sampleID)
+
+  expect_equal(m$convergence, 0)
+  expect_equal(coef(m), coef(m0), tolerance = 1e-5)
+  expect_equal(m$P, m0$P, tolerance = 1e-5)
+  # the estimated abundance is then T / P
+  a <- abundance(m0)
+  expect_equal(unname(m$N[as.character(a$id)]), a$N, tolerance = 1e-4)
+})
+
+test_that("estimated abundance and expected abundance", {
+  data <- prep_efn2_data()
+  m <- efn2(count ~ lifestage + pass12,
+    abundance = ~ lifestage + siteID + offset(log(area)),
+    data = data, pass = pass, id = sampleID)
+
+  expect_equal(m$convergence, 0)
+  expect_equal(m$N, m$catch + m$lambda * (1 - m$P))
+  expect_equal(unname(m$catch), as.vector(tapply(data$count, data$sampleID, sum)))
+  # lambda includes the offset
+  samples <- data[match(names(m$lambda), data$sampleID), ]
+  Xn <- model.matrix(~ lifestage + siteID, samples)
+  expect_equal(unname(m$lambda), unname(exp(drop(Xn %*% m$coefficients_n)) * samples$area))
+
+  expect_equal(dim(m$Vp_joint), rep(length(m$gam_cols) + length(m$gam_cols_n), 2))
+  expect_true(all(diag(m$Vb_n) > 0))
+})
+
+test_that("random effects in both models", {
+  data <- prep_efn2_data()
+  m <- efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    abundance = ~ lifestage + s(siteID, bs = "re") + offset(log(area)),
+    data = data, pass = pass, id = sampleID)
+
+  expect_equal(m$convergence, 0)
+  expect_equal(names(m$sigma), "s(visitID)")
+  expect_equal(names(m$sigma_n), "s(siteID)")
+  expect_true(is.matrix(m$Vp_joint))
+
+  out <- capture.output(print(m))
+  capture <- out[seq_len(grep("^Abundance", out) - 1)]
+  expect_true(any(grepl("sigma s\\(visitID\\)", capture)))
+  expect_false(any(grepl("sigma s\\(siteID\\)", capture)))
+  expect_true(any(grepl("not comparable with efp2", out)))
+})
+
+test_that("summary does not show abundance random effects for capture probability", {
+  data <- prep_efn2_data()
+  m <- efn2(count ~ lifestage + pass12,
+    abundance = ~ lifestage + s(siteID, bs = "re"),
+    data = data, pass = pass, id = sampleID)
+  out <- capture.output(print(m))
+  capture <- out[seq_len(grep("^Abundance", out) - 1)]
+  expect_false(any(grepl("Random effects", capture)))
+})
+
+test_that("informative errors", {
+  data <- prep_efn2_data()
+  expect_error(
+    efn2(count ~ pass12, abundance = ~ pass, data = data, pass = pass, id = sampleID),
+    "same for all passes"
+  )
+  expect_error(
+    efn2(count ~ pass12, abundance = count ~ lifestage, data = data, pass = pass, id = sampleID),
+    "one sided"
+  )
+})
