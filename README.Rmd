@@ -43,9 +43,6 @@ remotes::install_github("faskally/ef2")
 knitr::opts_chunk$set(fig.path = "man/figures/README-")
 library(ef2)
 library(mgcv)
-library(dplyr)
-library(reshape)
-library(lattice)
 data(ef2_data)
 ```
 
@@ -198,76 +195,53 @@ ef2_data$prob <- predict(m1, newdata = ef2_data, type = "response")
 Standard errors of the predictions are available using `se.fit = TRUE`. To use the plotting and prediction tools in `mgcv` the model can also be converted to a gam object using `as.gam2(m1)`.
 
 
-# Obtain Cumulative Estimates of _P_ (for estimation of densities later)
+# Cumulative Capture Probability and Abundance
 
 
-Aggregate counts by sampleID (i.e. counts of fry or parr per site visit)
-
-```{r}
-counts <- aggregate(count ~ sampleID, ef2_data, sum)
-```
-
-Reshape to get capture probability by species x lifestage x site visit x pass. This facilitates the summary of _P_.
-
-```{r results = 'hide', warning = FALSE, message = FALSE}
-probs <- cast(ef2_data, formula = sampleID ~ pass, value = "prob")
-```
-
-Get cumulative capture probability by sampleID (see [Glover _et al_., 2018](https://doi.org/10.1016/j.ecolind.2018.05.013))
+The cumulative capture probability of a sample, $P$, is the probability that a fish is caught on one of the passes. It is estimated for each sample, with standard errors and confidence intervals, using
 
 ```{r}
-probs $ prob <- apply(probs[,2:4], 1, function(x) 1 - prod(1-x))
+cp <- capture_prob(m1, se.fit = TRUE)
+head(cp)
 ```
 
-Remove individual pass capture probabilities
+The standard errors are of $\text{logit}(P)$, and the confidence intervals are computed on the logit scale. `newdata` can be used to estimate $P$ for other samples, for example single pass samples ([Glover _et al_., 2018](https://doi.org/10.1016/j.ecolind.2018.05.013)).
+
+Abundance is estimated as $\hat N = T / P$, and density (fish m^-2^) as $\hat N / A$, where $A$ is the area fished. The confidence intervals allow for both the binomial variation in the catch and the uncertainty in $P$
 
 ```{r}
-probs <- select(probs, sampleID, prob)
+dens <- abundance(m1, area = "area")
+head(dens)
 ```
 
-Remove pass and pass-specific data from dataframe
+To model counts directly, for example with a Poisson model, the offset is $\log(A P)$
 
 ```{r}
-densdata <- unique(select(ef2_data, -count, -prob, -pass, -pass12))
-```
-
-Join data and cumulative counts by sampleID
-
-```{r results = 'hide', warning = FALSE, message = FALSE}
-densdata <- left_join(densdata, counts, by = "sampleID")
-```
-
-Join data and cumulative capture probability by sampleID
-
-```{r results = 'hide', warning = FALSE, message = FALSE}
-densdata <- left_join(densdata, probs, by = "sampleID")
-```
-
-# Estimate Density
-
-
-
-Density (N/m^-2^) is estimated as $\frac{counts}{area*P}$
-
-```{r}
-densdata $ Density_Estimate <- densdata $ count / (densdata $ area *
-                                                      densdata $ prob)
-```
-
-If you want to model counts directly (Poisson model), you need to have cumulative P and area in the offset. For a Poisson model the offset is $\log({area*cumulativeP})$.
-
-```{r}
-densdata $ offset <- log(densdata $ area * densdata $ prob)
+dens$offset <- log(dens$area * dens$P)
 ```
 
 Plot to check
 
-```{r density, echo = F, fig.width = 6, fig.height = 4.5, fig.alt = "Estimated fish density by year for fry and parr at each site"}
-densdata <- densdata[order(densdata $ year), ]
-
-xyplot(Density_Estimate ~ fyear | lifestage, data = densdata, groups = siteID,
-       type = 'b', auto.key = T, scales = list(alternating = F),
-       xlab = "Year", ylab = expression(paste("Fish m"^-2)))
+```{r density, echo = FALSE, fig.width = 7, fig.height = 4.5, fig.alt = "Estimated fish density by year for fry and parr at each site, with 95% confidence intervals"}
+samples <- unique(ef2_data[c("sampleID", "siteID", "year", "lifestage")])
+dens <- merge(dens, samples, by.x = "id", by.y = "sampleID")
+dens$year <- as.numeric(as.character(dens$year))
+sites <- levels(dens$siteID)
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
+for (ls in levels(dens$lifestage)) {
+  d <- dens[dens$lifestage == ls, ]
+  d <- d[order(d$siteID, d$year), ]
+  plot(d$year, d$density, type = "n", ylim = c(0, max(dens$density_upper)),
+       xlab = "Year", ylab = expression(paste("Fish m"^-2)), main = ls)
+  for (i in seq_along(sites)) {
+    di <- d[d$siteID == sites[i], ]
+    x <- di$year + (i - 2) * 0.08
+    arrows(x, di$density_lower, x, di$density_upper,
+           angle = 90, code = 3, length = 0.02, col = i)
+    lines(x, di$density, type = "b", pch = 16, col = i)
+  }
+}
+legend("topright", legend = sites, col = seq_along(sites), pch = 16, bty = "n")
 ```
 
 

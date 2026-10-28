@@ -1,4 +1,5 @@
-# log likelihood of a single multipass electrofishing sample, computed on
+# log likelihood of a single multipass electrofishing sample, and the log
+# of the cumulative capture probability over all passes, computed on
 # the log scale from the linear predictor so that it stays finite when
 # capture probabilities are close to 0 or 1
 ll_sample <- function(eta, y) {
@@ -12,7 +13,7 @@ ll_sample <- function(eta, y) {
   }
   # log probability of capture over all passes, log(1 - prod(1 - p))
   log_P <- logspace_sub(0, sum(log_q))
-  sum(y * log_pi) - sum(y) * log_P
+  list(ll = sum(y * log_pi) - sum(y) * log_P, log_P = log_P)
 }
 
 # negative log likelihood, the RTMB objective function
@@ -54,9 +55,16 @@ ef_nll <- function(params, efdat) {
     }
   }
 
+  log_P <- vector("list", length(idx))
   for (i in seq_along(idx)) {
-    nll <- nll - ll_sample(etas[[i]], ys[[i]])
+    ll <- ll_sample(etas[[i]], ys[[i]])
+    nll <- nll - ll$ll
+    log_P[[i]] <- ll$log_P
   }
+
+  # cumulative capture probability of each sample
+  P <- exp(do.call(c, log_P))
+  REPORT(P)
 
   # delta method for sigma
   if (length(sigma)) {

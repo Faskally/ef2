@@ -15,6 +15,11 @@ reference:
   - predict.efp2
   - efp2-methods
   - as.gam2
+- title: Abundance
+  desc: Cumulative capture probability, abundance and density of each sample.
+  contents:
+  - capture_prob
+  - abundance
 - title: Data
   contents:
   - ef2_data

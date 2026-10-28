@@ -15,6 +15,9 @@
   which could give a singular penalty and NaN likelihood on macOS
 * when standard errors cannot be computed, `efp2()` warns which parameters
   are affected, instead of "NaNs produced"
+* new `capture_prob()` and `abundance()` give the cumulative capture
+  probability, abundance and density of each sample with confidence
+  intervals; the cumulative capture probability is also reported in `$P`
 
 # ef 2.0.0 (2026-10-09)
 

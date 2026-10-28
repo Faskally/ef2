@@ -338,6 +338,9 @@ efp2 <- function(formula, data = NULL, pass = pass, id = id,
   out$pi <- as.vector(
     ave(out$p, factor(id), FUN = function(x) x * c(1, cumprod(1 - x)[-length(x)]))
   )
+  # cumulative capture probability of each sample, named by id
+  out$P <- out$rep$P
+  names(out$P) <- levels(efdat$sample_id)
   
   fx_pars <- grep("beta", names(opt$par))
   out$sdrep <- muffle_nan(

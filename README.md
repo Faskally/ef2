@@ -110,20 +110,21 @@ m1 <-
     ## 
     ## Formula:
     ## count ~ siteID + fyear + pass12 + lifestage
+    ## <environment: 0x5577755fd210>
     ## 
     ## No random effects
     ## 
     ## Coefficients:
-    ##                Estimate Std. Error  z value Pr(>|z^2|)
-    ## (Intercept)    0.652301     0.1723  3.78656  1.527e-04
-    ## siteIDSite2    0.074540     0.1354  0.55059  5.819e-01
-    ## siteIDSite3   -0.023719     0.1473 -0.16098  8.721e-01
-    ## fyear2012     -0.209949     0.1736 -1.20936  2.265e-01
-    ## fyear2013      0.046976     0.1855  0.25317  8.001e-01
-    ## fyear2014      0.358431     0.1834  1.95389  5.071e-02
-    ## fyear2015     -0.004013     0.2114 -0.01899  9.849e-01
-    ## pass122       -0.239160     0.1311 -1.82436  6.810e-02
-    ## lifestageParr  0.590641     0.1210  4.88208  1.050e-06
+    ##               Estimate Std. Error  z value Pr(>|z^2|)
+    ## (Intercept)    0.65231     0.1723  3.78665  1.527e-04
+    ## siteIDSite2    0.07453     0.1354  0.55053  5.820e-01
+    ## siteIDSite3   -0.02373     0.1473 -0.16106  8.720e-01
+    ## fyear2012     -0.20996     0.1736 -1.20943  2.265e-01
+    ## fyear2013      0.04698     0.1855  0.25318  8.001e-01
+    ## fyear2014      0.35844     0.1834  1.95392  5.071e-02
+    ## fyear2015     -0.00402     0.2114 -0.01902  9.848e-01
+    ## pass122       -0.23915     0.1311 -1.82432  6.810e-02
+    ## lifestageParr  0.59065     0.1210  4.88215  1.049e-06
     ## 
     ## Degrees of Freedom: 90 Total (i.e. Null);  81 Residual
     ## AIC: 3188
@@ -168,6 +169,7 @@ m1_smooth <-
     ## Formula:
     ## count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
     ##     pass12 + lifestage
+    ## <environment: 0x5577755fd210>
     ## 
     ## Random effects:
     ##                Estimate Std. Error
@@ -175,8 +177,8 @@ m1_smooth <-
     ## 
     ## Coefficients:
     ##               Estimate Std. Error z value Pr(>|z^2|)
-    ## (Intercept)    0.59939     0.1565  3.8304  1.279e-04
-    ## siteIDSite2    0.08302     0.1345  0.6171  5.371e-01
+    ## (Intercept)    0.59940     0.1565  3.8304  1.279e-04
+    ## siteIDSite2    0.08303     0.1345  0.6172  5.371e-01
     ## siteIDSite3   -0.02424     0.1466 -0.1653  8.687e-01
     ## pass122       -0.24364     0.1309 -1.8614  6.269e-02
     ## lifestageParr  0.59448     0.1160  5.1239  2.993e-07
@@ -246,19 +248,20 @@ m1_doy <-
     ## Formula:
     ## count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
     ##     pass12 + lifestage
+    ## <environment: 0x5577755fd210>
     ## 
     ## Random effects:
     ##                Estimate Std. Error
-    ## sigma s(fdoy) 3.937e-05   0.001866
+    ## sigma s(fdoy) 1.381e-06   0.001853
     ## 
     ## Coefficients:
     ##                Estimate Std. Error  z value Pr(>|z^2|)
-    ## (Intercept)    0.678300     0.1178  5.75842  8.491e-09
-    ## siteIDSite2    0.001903     0.1448  0.01314  9.895e-01
-    ## siteIDSite3   -0.158737     0.1653 -0.96058  3.368e-01
-    ## pass122       -0.254290     0.1308 -1.94349  5.196e-02
-    ## lifestageParr  0.607910     0.1135  5.35677  8.472e-08
-    ## s(fdoy).null1 -0.550210     0.3837 -1.43391  1.516e-01
+    ## (Intercept)    0.678310     0.1178  5.75868  8.478e-09
+    ## siteIDSite2    0.001894     0.1448  0.01309  9.896e-01
+    ## siteIDSite3   -0.158752     0.1653 -0.96067  3.367e-01
+    ## pass122       -0.254288     0.1308 -1.94348  5.196e-02
+    ## lifestageParr  0.607910     0.1135  5.35678  8.472e-08
+    ## s(fdoy).null1 -0.550221     0.3837 -1.43400  1.516e-01
     ## 
     ## Degrees of Freedom: 90 Total (i.e. Null);  83 Residual
     ## AIC: 3196
@@ -304,72 +307,65 @@ Standard errors of the predictions are available using `se.fit = TRUE`.
 To use the plotting and prediction tools in `mgcv` the model can also be
 converted to a gam object using `as.gam2(m1)`.
 
-# Obtain Cumulative Estimates of *P* (for estimation of densities later)
+# Cumulative Capture Probability and Abundance
 
-Aggregate counts by sampleID (i.e. counts of fry or parr per site visit)
+The cumulative capture probability of a sample, $P$, is the probability
+that a fish is caught on one of the passes. It is estimated for each
+sample, with standard errors and confidence intervals, using
 
 ``` r
-counts <- aggregate(count ~ sampleID, ef2_data, sum)
+cp <- capture_prob(m1, se.fit = TRUE)
+head(cp)
 ```
 
-Reshape to get capture probability by species x lifestage x site visit x
-pass. This facilitates the summary of *P*.
+    ##   id npass         P        se     lower     upper
+    ## 1  2     3 0.9838939 0.4557355 0.9615466 0.9933439
+    ## 2  1     3 0.9457095 0.3923452 0.8897905 0.9740823
+    ## 3 29     3 0.9210062 0.3264868 0.8601089 0.9567274
+    ## 4 30     3 0.9745545 0.4222702 0.9436305 0.9887166
+    ## 5 16     3 0.9855114 0.3968673 0.9689903 0.9932915
+    ## 6 15     3 0.9502933 0.3846208 0.8999607 0.9759781
+
+The standard errors are of $\text{logit}(P)$, and the confidence
+intervals are computed on the logit scale. `newdata` can be used to
+estimate $P$ for other samples, for example single pass samples ([Glover
+*et al*., 2018](https://doi.org/10.1016/j.ecolind.2018.05.013)).
+
+Abundance is estimated as $\hat N = T / P$, and density (fish
+m<sup>-2</sup>) as $\hat N / A$, where $A$ is the area fished. The
+confidence intervals allow for both the binomial variation in the catch
+and the uncertainty in $P$
 
 ``` r
-probs <- cast(ef2_data, formula = sampleID ~ pass, value = "prob")
+dens <- abundance(m1, area = "area")
+head(dens)
 ```
 
-Get cumulative capture probability by sampleID (see [Glover *et al*.,
-2018](https://doi.org/10.1016/j.ecolind.2018.05.013))
+    ##   id catch         P       se         N    lower     upper area   density
+    ## 1  2    42 0.9838939 0.892726  42.68753  42.0000  44.47359  122 0.3498978
+    ## 2  1    49 0.9457095 2.047553  51.81295  49.0000  55.98559  122 0.4246963
+    ## 3 29   140 0.9210062 5.329788 152.00766 141.9123 162.82116  122 1.2459644
+    ## 4 30    41 0.9745545 1.141402  42.07050  41.0000  44.36816  122 0.3448402
+    ## 5 16    86 0.9855114 1.238831  87.26434  86.0000  89.72650  122 0.7152815
+    ## 6 15    50 0.9502933 1.940101  52.61533  50.0000  56.55864  122 0.4312732
+    ##   density_lower density_upper
+    ## 1     0.3442623     0.3645377
+    ## 2     0.4016393     0.4588983
+    ## 3     1.1632158     1.3345996
+    ## 4     0.3360656     0.3636734
+    ## 5     0.7049180     0.7354631
+    ## 6     0.4098361     0.4635954
+
+To model counts directly, for example with a Poisson model, the offset
+is $\log(A P)$
 
 ``` r
-probs $ prob <- apply(probs[,2:4], 1, function(x) 1 - prod(1-x))
-```
-
-Remove individual pass capture probabilities
-
-``` r
-probs <- select(probs, sampleID, prob)
-```
-
-Remove pass and pass-specific data from dataframe
-
-``` r
-densdata <- unique(select(ef2_data, -count, -prob, -pass, -pass12))
-```
-
-Join data and cumulative counts by sampleID
-
-``` r
-densdata <- left_join(densdata, counts, by = "sampleID")
-```
-
-Join data and cumulative capture probability by sampleID
-
-``` r
-densdata <- left_join(densdata, probs, by = "sampleID")
-```
-
-# Estimate Density
-
-Density (N/m<sup>-2</sup>) is estimated as $\frac{counts}{area*P}$
-
-``` r
-densdata $ Density_Estimate <- densdata $ count / (densdata $ area *
-                                                      densdata $ prob)
-```
-
-If you want to model counts directly (Poisson model), you need to have
-cumulative P and area in the offset. For a Poisson model the offset is
-$\log({area*cumulativeP})$.
-
-``` r
-densdata $ offset <- log(densdata $ area * densdata $ prob)
+dens$offset <- log(dens$area * dens$P)
 ```
 
 Plot to check
 
-<img src="man/figures/README-density-1.png" alt="Estimated fish density by year for fry and parr at each site"  />
+<img src="man/figures/README-density-1.png" alt="Estimated fish density by year for fry and parr at each site, with 95% confidence intervals"  />
 
 # Comparing Models
 
@@ -404,23 +400,24 @@ mfull
     ## Formula:
     ## count ~ siteID + year + lifestage + pass12 + s(visitID, bs = "re") + 
     ##     s(fsampleID, bs = "re")
+    ## <environment: 0x5577755fd210>
     ## 
     ## Random effects:
-    ##                    Estimate Std. Error
-    ## sigma s(visitID)    0.01161    0.06545
-    ## sigma s(fsampleID)  0.07751    0.16450
+    ##                     Estimate Std. Error
+    ## sigma s(visitID)   5.965e-05    0.06556
+    ## sigma s(fsampleID) 7.591e-02    0.17106
     ## 
     ## Coefficients:
     ##                Estimate Std. Error  z value Pr(>|z^2|)
-    ## (Intercept)    0.648112     0.1778  3.64471  2.677e-04
-    ## siteIDSite2    0.079936     0.1421  0.56244  5.738e-01
-    ## siteIDSite3   -0.016579     0.1556 -0.10658  9.151e-01
-    ## year2012      -0.208267     0.1798 -1.15807  2.468e-01
-    ## year2013       0.042128     0.1931  0.21814  8.273e-01
-    ## year2014       0.361853     0.1899  1.90504  5.678e-02
-    ## year2015      -0.003164     0.2172 -0.01457  9.884e-01
-    ## lifestageParr  0.588162     0.1253  4.69505  2.665e-06
-    ## pass122       -0.236059     0.1318 -1.79112  7.327e-02
+    ## (Intercept)    0.648110     0.1775  3.65176  2.605e-04
+    ## siteIDSite2    0.079488     0.1418  0.56064  5.750e-01
+    ## siteIDSite3   -0.016539     0.1553 -0.10648  9.152e-01
+    ## year2012      -0.208321     0.1793 -1.16174  2.453e-01
+    ## year2013       0.042289     0.1926  0.21953  8.262e-01
+    ## year2014       0.362184     0.1895  1.91137  5.596e-02
+    ## year2015      -0.002674     0.2168 -0.01234  9.902e-01
+    ## lifestageParr  0.588609     0.1251  4.70513  2.537e-06
+    ## pass122       -0.235586     0.1318 -1.78694  7.395e-02
     ## 
     ## Degrees of Freedom: 90 Total (i.e. Null);  79 Residual
     ## AIC: 3192
@@ -433,7 +430,7 @@ mfull$sigma
 ```
 
     ##   s(visitID) s(fsampleID) 
-    ##   0.01161307   0.07751480
+    ## 5.965191e-05 7.591194e-02
 
 Because the random effects are part of the likelihood, models can be
 compared directly using AIC
@@ -444,7 +441,7 @@ compared directly using AIC
 AIC(mfull)
 ```
 
-    ## [1] 3192.268
+    ## [1] 3192.252
 
 - Model without lifestage
 
@@ -456,7 +453,7 @@ mlife <- efp2(count ~ siteID + year + pass12 +
 AIC(mlife)
 ```
 
-    ## [1] 3206.624
+    ## [1] 3206.62
 
 ## contributing
 
