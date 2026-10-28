@@ -119,7 +119,6 @@ m1 <-
 ## 
 ## Formula:
 ## count ~ siteID + fyear + pass12 + lifestage
-## <environment: 0x5ff25a9f7210>
 ## 
 ## No random effects
 ## 
@@ -183,7 +182,6 @@ m1_smooth <-
 ## Formula:
 ## count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
 ##     pass12 + lifestage
-## <environment: 0x5ff25a9f7210>
 ## 
 ## Random effects:
 ##                Estimate Std. Error
@@ -271,11 +269,10 @@ m1_doy <-
 ## Formula:
 ## count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
 ##     pass12 + lifestage
-## <environment: 0x5ff25a9f7210>
 ## 
 ## Random effects:
 ##                Estimate Std. Error
-## sigma s(fdoy) 1.381e-06   0.001853
+## sigma s(fdoy) 1.381e-06   0.001964
 ## 
 ## Coefficients:
 ##                Estimate Std. Error  z value Pr(>|z^2|)
@@ -480,7 +477,6 @@ mfull
 ## Formula:
 ## count ~ siteID + year + lifestage + pass12 + s(visitID, bs = "re") + 
 ##     s(fsampleID, bs = "re")
-## <environment: 0x5ff25a9f7210>
 ## 
 ## Random effects:
 ##                     Estimate Std. Error
@@ -513,7 +509,7 @@ mfull$sigma
 
 ``` R
 ##   s(visitID) s(fsampleID) 
-## 5.965191e-05 7.591194e-02
+## 5.965196e-05 7.591194e-02
 ```
 
 Because the random effects are part of the likelihood, models can be

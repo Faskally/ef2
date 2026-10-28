@@ -11,3 +11,5 @@ can be compared with the truth.
   effects](https://faskally.github.io/ef2/articles/random-effects.md):
 - [Smooth terms for year and day of the
   year](https://faskally.github.io/ef2/articles/smooth-terms.md):
+- [Realised and expected
+  abundance](https://faskally.github.io/ef2/articles/realised-expected.md):

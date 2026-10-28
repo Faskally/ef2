@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="articles/simulating-data.html">Simulating electrofishing data</a></li>
     <li><a class="dropdown-item" href="articles/random-effects.html">Visit and sample random effects</a></li>
     <li><a class="dropdown-item" href="articles/smooth-terms.html">Smooth terms for year and day of the year</a></li>
+    <li><a class="dropdown-item" href="articles/realised-expected.html">Realised and expected abundance</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -123,24 +124,23 @@
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="do">## Formula:</span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="do">## count ~ siteID + fyear + pass12 + lifestage</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="do">## No random effects</span></span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="do">##               Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="do">## (Intercept)    0.65231     0.1723  3.78665  1.527e-04</span></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="do">## siteIDSite2    0.07453     0.1354  0.55053  5.820e-01</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="do">## siteIDSite3   -0.02373     0.1473 -0.16106  8.720e-01</span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="do">## fyear2012     -0.20996     0.1736 -1.20943  2.265e-01</span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="do">## fyear2013      0.04698     0.1855  0.25318  8.001e-01</span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="do">## fyear2014      0.35844     0.1834  1.95392  5.071e-02</span></span>
-<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="do">## fyear2015     -0.00402     0.2114 -0.01902  9.848e-01</span></span>
-<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="do">## pass122       -0.23915     0.1311 -1.82432  6.810e-02</span></span>
-<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="do">## lifestageParr  0.59065     0.1210  4.88215  1.049e-06</span></span>
-<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  81 Residual</span></span>
-<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="do">## AIC: 3188</span></span></code></pre></div>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="do">## No random effects</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="do">##               Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="do">## (Intercept)    0.65231     0.1723  3.78665  1.527e-04</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="do">## siteIDSite2    0.07453     0.1354  0.55053  5.820e-01</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="do">## siteIDSite3   -0.02373     0.1473 -0.16106  8.720e-01</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="do">## fyear2012     -0.20996     0.1736 -1.20943  2.265e-01</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="do">## fyear2013      0.04698     0.1855  0.25318  8.001e-01</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="do">## fyear2014      0.35844     0.1834  1.95392  5.071e-02</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="do">## fyear2015     -0.00402     0.2114 -0.01902  9.848e-01</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="do">## pass122       -0.23915     0.1311 -1.82432  6.810e-02</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="do">## lifestageParr  0.59065     0.1210  4.88215  1.049e-06</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  81 Residual</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="do">## AIC: 3188</span></span></code></pre></div>
 </div>
 <div class="section level1">
 <h1 id="smooth-terms">Smooth Terms<a class="anchor" aria-label="anchor" href="#smooth-terms"></a>
@@ -169,22 +169,21 @@
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="do">## Formula:</span></span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="do">## count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + </span></span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="do">##     pass12 + lifestage</span></span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="do">## Random effects:</span></span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="do">##                Estimate Std. Error</span></span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="do">## sigma s(fyear)    0.192     0.1239</span></span>
-<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="do">##               Estimate Std. Error z value Pr(&gt;|z^2|)</span></span>
-<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a><span class="do">## (Intercept)    0.59940     0.1565  3.8304  1.279e-04</span></span>
-<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a><span class="do">## siteIDSite2    0.08303     0.1345  0.6172  5.371e-01</span></span>
-<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="do">## siteIDSite3   -0.02424     0.1466 -0.1653  8.687e-01</span></span>
-<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="do">## pass122       -0.24364     0.1309 -1.8614  6.269e-02</span></span>
-<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a><span class="do">## lifestageParr  0.59448     0.1160  5.1239  2.993e-07</span></span>
-<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  84 Residual</span></span>
-<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="do">## AIC: 3193</span></span></code></pre></div>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="do">## Random effects:</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="do">##                Estimate Std. Error</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="do">## sigma s(fyear)    0.192     0.1239</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="do">##               Estimate Std. Error z value Pr(&gt;|z^2|)</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="do">## (Intercept)    0.59940     0.1565  3.8304  1.279e-04</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a><span class="do">## siteIDSite2    0.08303     0.1345  0.6172  5.371e-01</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a><span class="do">## siteIDSite3   -0.02424     0.1466 -0.1653  8.687e-01</span></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="do">## pass122       -0.24364     0.1309 -1.8614  6.269e-02</span></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="do">## lifestageParr  0.59448     0.1160  5.1239  2.993e-07</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  84 Residual</span></span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a><span class="do">## AIC: 3193</span></span></code></pre></div>
 <p>The standard deviation, <code>sigma s(fyear)</code>, is that of the steps of the random walk on the logit scale. The starting value of the walk is a fixed effect, so the intercept is for the first year.</p>
 <p>The smooth effect of year on capture probability, here for the first pass for fry at Site1, with approximate 95% confidence intervals</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -227,23 +226,22 @@
 <span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="do">## Formula:</span></span>
 <span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="do">## count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + </span></span>
 <span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="do">##     pass12 + lifestage</span></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="do">## Random effects:</span></span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="do">##                Estimate Std. Error</span></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="do">## sigma s(fdoy) 1.381e-06   0.001853</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="do">##                Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
-<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="do">## (Intercept)    0.678310     0.1178  5.75868  8.478e-09</span></span>
-<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="do">## siteIDSite2    0.001894     0.1448  0.01309  9.896e-01</span></span>
-<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="do">## siteIDSite3   -0.158752     0.1653 -0.96067  3.367e-01</span></span>
-<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="do">## pass122       -0.254288     0.1308 -1.94348  5.196e-02</span></span>
-<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="do">## lifestageParr  0.607910     0.1135  5.35678  8.472e-08</span></span>
-<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="do">## s(fdoy).null1 -0.550221     0.3837 -1.43400  1.516e-01</span></span>
-<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  83 Residual</span></span>
-<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="do">## AIC: 3196</span></span></code></pre></div>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="do">## Random effects:</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="do">##                Estimate Std. Error</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="do">## sigma s(fdoy) 1.381e-06   0.001964</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="do">##                Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="do">## (Intercept)    0.678310     0.1178  5.75868  8.478e-09</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="do">## siteIDSite2    0.001894     0.1448  0.01309  9.896e-01</span></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="do">## siteIDSite3   -0.158752     0.1653 -0.96067  3.367e-01</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="do">## pass122       -0.254288     0.1308 -1.94348  5.196e-02</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="do">## lifestageParr  0.607910     0.1135  5.35678  8.472e-08</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="do">## s(fdoy).null1 -0.550221     0.3837 -1.43400  1.516e-01</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  83 Residual</span></span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="do">## AIC: 3196</span></span></code></pre></div>
 <p>In this case the standard deviation is very close to zero, so the smooth has been shrunk to its unpenalised part, a linear trend in day of the year (the fixed effect <code>s(fdoy).null1</code>).</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">newdata</span> <span class="op">&lt;-</span></span>
@@ -358,32 +356,31 @@
 <span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="do">## Formula:</span></span>
 <span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="do">## count ~ siteID + year + lifestage + pass12 + s(visitID, bs = "re") + </span></span>
 <span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="do">##     s(fsampleID, bs = "re")</span></span>
-<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
-<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="do">## Random effects:</span></span>
-<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="do">##                     Estimate Std. Error</span></span>
-<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="do">## sigma s(visitID)   5.965e-05    0.06556</span></span>
-<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="do">## sigma s(fsampleID) 7.591e-02    0.17106</span></span>
-<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="do">##                Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
-<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="do">## (Intercept)    0.648110     0.1775  3.65176  2.605e-04</span></span>
-<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="do">## siteIDSite2    0.079488     0.1418  0.56064  5.750e-01</span></span>
-<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a><span class="do">## siteIDSite3   -0.016539     0.1553 -0.10648  9.152e-01</span></span>
-<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a><span class="do">## year2012      -0.208321     0.1793 -1.16174  2.453e-01</span></span>
-<span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a><span class="do">## year2013       0.042289     0.1926  0.21953  8.262e-01</span></span>
-<span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a><span class="do">## year2014       0.362184     0.1895  1.91137  5.596e-02</span></span>
-<span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a><span class="do">## year2015      -0.002674     0.2168 -0.01234  9.902e-01</span></span>
-<span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a><span class="do">## lifestageParr  0.588609     0.1251  4.70513  2.537e-06</span></span>
-<span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a><span class="do">## pass122       -0.235586     0.1318 -1.78694  7.395e-02</span></span>
-<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  79 Residual</span></span>
-<span id="cb29-30"><a href="#cb29-30" tabindex="-1"></a><span class="do">## AIC: 3192</span></span></code></pre></div>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="do">## Random effects:</span></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="do">##                     Estimate Std. Error</span></span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="do">## sigma s(visitID)   5.965e-05    0.06556</span></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="do">## sigma s(fsampleID) 7.591e-02    0.17106</span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
+<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="do">##                Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="do">## (Intercept)    0.648110     0.1775  3.65176  2.605e-04</span></span>
+<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="do">## siteIDSite2    0.079488     0.1418  0.56064  5.750e-01</span></span>
+<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="do">## siteIDSite3   -0.016539     0.1553 -0.10648  9.152e-01</span></span>
+<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a><span class="do">## year2012      -0.208321     0.1793 -1.16174  2.453e-01</span></span>
+<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a><span class="do">## year2013       0.042289     0.1926  0.21953  8.262e-01</span></span>
+<span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a><span class="do">## year2014       0.362184     0.1895  1.91137  5.596e-02</span></span>
+<span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a><span class="do">## year2015      -0.002674     0.2168 -0.01234  9.902e-01</span></span>
+<span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a><span class="do">## lifestageParr  0.588609     0.1251  4.70513  2.537e-06</span></span>
+<span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a><span class="do">## pass122       -0.235586     0.1318 -1.78694  7.395e-02</span></span>
+<span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  79 Residual</span></span>
+<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a><span class="do">## AIC: 3192</span></span></code></pre></div>
 <p>The estimated standard deviations of the visit and sample random effects (on the logit scale) are</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mfull</span><span class="op">$</span><span class="va">sigma</span></span></code></pre></div>
 <div class="sourceCode" id="cb31"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="do">##   s(visitID) s(fsampleID) </span></span>
-<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="do">## 5.965191e-05 7.591194e-02</span></span></code></pre></div>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="do">## 5.965196e-05 7.591194e-02</span></span></code></pre></div>
 <p>Because the random effects are part of the likelihood, models can be compared directly using AIC</p>
 <ul>
 <li>Full model</li>
