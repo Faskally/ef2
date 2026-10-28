@@ -25,3 +25,10 @@
 - when standard errors cannot be computed,
   [`efp2()`](https://faskally.github.io/ef2/reference/efp2.md) warns
   which parameters are affected, instead of “NaNs produced”
+- new
+  [`capture_prob()`](https://faskally.github.io/ef2/reference/capture_prob.md)
+  and
+  [`abundance()`](https://faskally.github.io/ef2/reference/abundance.md)
+  give the cumulative capture probability, abundance and density of each
+  sample with confidence intervals; the cumulative capture probability
+  is also reported in `$P`

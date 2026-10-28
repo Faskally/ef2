@@ -29,6 +29,15 @@ Estimate capture probability from multipass electrofishing data.
 - [`as.gam2()`](https://faskally.github.io/ef2/reference/as.gam2.md) :
   Conversion of an efp2 fit to a gam fit for plotting
 
+## Abundance
+
+Cumulative capture probability, abundance and density of each sample.
+
+- [`capture_prob()`](https://faskally.github.io/ef2/reference/capture_prob.md)
+  : Cumulative capture probability of each sample
+- [`abundance()`](https://faskally.github.io/ef2/reference/abundance.md)
+  : Estimate abundance and density from removal samples
+
 ## Data
 
 - [`ef2_data`](https://faskally.github.io/ef2/reference/ef2_data.md) :
