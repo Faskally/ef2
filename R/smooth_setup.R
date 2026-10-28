@@ -58,10 +58,19 @@ smooth_block <- function(X, S, centred = FALSE, N = NULL) {
 
   # the coefficients to remove, one for each dimension of the null space:
   # these are the first coefficients which identify the null space, so for
-  # a random walk they are the starting values
+  # a random walk they are the starting values. Rows of N which are zero up
+  # to rounding error are skipped using a tolerance, as on some platforms
+  # they are not exactly zero
   drop_coef <- integer(0)
   if (ncol(N)) {
-    drop_coef <- sort(qr(t(N))$pivot[seq_len(ncol(N))])
+    tol <- sqrt(.Machine$double.eps)
+    for (j in seq_len(k)) {
+      cand <- c(drop_coef, j)
+      if (min(svd(N[cand, , drop = FALSE], nu = 0, nv = 0)$d) > tol) {
+        drop_coef <- cand
+      }
+      if (length(drop_coef) == ncol(N)) break
+    }
   }
   keep <- setdiff(seq_len(k), drop_coef)
   S <- lapply(S, function(s) s[keep, keep, drop = FALSE])

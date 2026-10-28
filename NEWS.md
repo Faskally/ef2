@@ -11,6 +11,8 @@
   `plogis()` from stats instead
 * `as.gam()` is renamed `as.gam2()` and `ef_data` is renamed `ef2_data`,
   so no names clash with ef
+* fix the choice of coefficients removed for the null space of a smooth,
+  which could give a singular penalty and NaN likelihood on macOS
 
 # ef 2.0.0 (2026-10-09)
 
