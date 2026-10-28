@@ -11,6 +11,7 @@ efn2(
   pass = pass,
   id = id,
   distribution = c("poisson", "negbin"),
+  cut = FALSE,
   offset = NULL,
   verbose = FALSE,
   hessian = TRUE,
@@ -37,6 +38,13 @@ and random effects can be used as in \code{formula}.}
 \item{distribution}{the distribution of the number of fish in a sample,
 \code{"poisson"} or \code{"negbin"}, the negative binomial with mean
 \eqn{\lambda_s} and size \eqn{\theta}, which is estimated}
+
+\item{cut}{if TRUE, capture probability is estimated from the
+conditional likelihood only, as in \code{\link{efp2}}, and the model for
+abundance is then fitted with capture probability fixed, so that the
+abundance model cannot influence capture probability ("cutting
+feedback"). The uncertainty in capture probability is carried through
+to the abundance parameters, see Details.}
 
 \item{offset}{an optional offset for the linear predictor of capture
 probability. An offset for log abundance is given in \code{abundance}.}
@@ -109,6 +117,20 @@ likelihood, and as \eqn{\theta} tends to infinity to the Poisson estimate.
 
 The log likelihood includes the likelihood of the total catches, so it
 cannot be compared with that of a model fitted by \code{efp2}.
+
+With \code{cut = TRUE} the fit has two stages. Capture probability is
+estimated from the conditional likelihood, as in \code{efp2}, and the
+parameters for abundance are then estimated from the likelihood of the
+total catches with capture probability fixed. The covariance matrix of
+the abundance parameters allows for the uncertainty in capture
+probability: with \eqn{A} the Hessian of the abundance part of the
+negative log likelihood with respect to the abundance parameters,
+\eqn{C} its cross derivatives with respect to the capture parameters and
+\eqn{V_1} the covariance matrix of the capture parameters, the
+covariance matrix of the abundance parameters is \eqn{A^{-1} + A^{-1} C
+V_1 C^\top A^{-1}} (Murphy and Topel, 1985). This is conditional on the
+standard deviations of the random effects. The cut estimates do not
+maximise the joint likelihood, so there is no AIC.
 }
 \examples{
 ef2_data$pass12 <- factor(pmin(ef2_data$pass, 2))
@@ -121,6 +143,10 @@ m1 <- efn2(count ~ lifestage + pass12,
 m1
 }
 \references{
+Murphy, K. M. and Topel, R. H. (1985) Estimation and inference in two-step
+econometric models. Journal of Business and Economic Statistics, 3,
+370-379. \doi{10.1080/07350015.1985.10509471}
+
 Dorazio, R. M., Jelks, H. L. and Jordan, F. (2005) Improving removal-based
 estimates of abundance by sampling a population of spatially distinct
 subpopulations. Biometrics, 61, 1093-1101.

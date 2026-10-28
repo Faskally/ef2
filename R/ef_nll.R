@@ -106,38 +106,22 @@ ef_nll <- function(params, efdat) {
 #     and distribution "poisson" or "negbin"
 ef_nll_joint <- function(params, efdat, ndat) {
   cap <- capture_nll(params$alpha, params$beta, params$log_sigma, efdat)
+  ab <- abundance_nll(params, cap$log_P, efdat, ndat)
+  nll <- cap$nll + ab$nll
 
-  log_lambda <- linear_predictor(ndat, params$beta_n, params$alpha_n)
-  sigma_n <- exp(params$log_sigma_n)
-  nll <- cap$nll + re_nll(params$alpha_n, sigma_n, ndat$blocks)
-
-  # the total catch has mean lambda P, and is Poisson if the number of fish
-  # is Poisson, or negative binomial with size theta if the number of fish
-  # is negative binomial
-  y <- ndat$y
-  log_mu <- log_lambda + cap$log_P
   if (identical(ndat$distribution, "negbin")) {
-    theta <- exp(params$log_theta)
-    log_theta_mu <- logspace_add(params$log_theta + 0 * log_mu, log_mu)
-    nll <- nll - sum(
-      lgamma(y + theta) - lgamma(theta) - lgamma(y + 1) +
-        theta * (params$log_theta - log_theta_mu) + y * (log_mu - log_theta_mu)
-    )
+    theta <- ab$theta
     REPORT(theta)
     ADREPORT(theta)
-  } else {
-    nll <- nll - sum(y * log_mu - exp(log_mu) - lgamma(y + 1))
   }
-  # the multinomial coefficients, which are left out of the conditional
-  # likelihood, so that this is the full log likelihood of the catches
-  nll <- nll - (sum(lgamma(y + 1)) - sum(lgamma(efdat$y + 1)))
 
   P <- exp(cap$log_P)
-  lambda <- exp(log_lambda)
+  lambda <- exp(ab$log_lambda)
   REPORT(P)
   REPORT(lambda)
 
   sigma <- cap$sigma
+  sigma_n <- ab$sigma_n
   if (length(sigma)) {
     ADREPORT(sigma)
   }
@@ -151,4 +135,43 @@ ef_nll_joint <- function(params, efdat, ndat) {
   REPORT(ps)
 
   nll
+}
+
+# the part of the joint negative log likelihood that involves abundance:
+# the likelihood of the total catches given the log cumulative capture
+# probabilities log_P, and the density of the abundance random effects
+abundance_nll <- function(params, log_P, efdat, ndat) {
+  log_lambda <- linear_predictor(ndat, params$beta_n, params$alpha_n)
+  sigma_n <- exp(params$log_sigma_n)
+  nll <- re_nll(params$alpha_n, sigma_n, ndat$blocks)
+
+  # the total catch has mean lambda P, and is Poisson if the number of fish
+  # is Poisson, or negative binomial with size theta if the number of fish
+  # is negative binomial
+  y <- ndat$y
+  log_mu <- log_lambda + log_P
+  theta <- NULL
+  if (identical(ndat$distribution, "negbin")) {
+    theta <- exp(params$log_theta)
+    log_theta_mu <- logspace_add(params$log_theta + 0 * log_mu, log_mu)
+    nll <- nll - sum(
+      lgamma(y + theta) - lgamma(theta) - lgamma(y + 1) +
+        theta * (params$log_theta - log_theta_mu) + y * (log_mu - log_theta_mu)
+    )
+  } else {
+    nll <- nll - sum(y * log_mu - exp(log_mu) - lgamma(y + 1))
+  }
+  # the multinomial coefficients, which are left out of the conditional
+  # likelihood, so that the joint likelihood is the full likelihood of the
+  # catches
+  nll <- nll - (sum(lgamma(y + 1)) - sum(lgamma(efdat$y + 1)))
+
+  list(nll = nll, log_lambda = log_lambda, sigma_n = sigma_n, theta = theta)
+}
+
+# the abundance part of the joint negative log likelihood as a function of
+# all the parameters, used for the cross derivatives in the cut model
+cut_nll <- function(params, efdat, ndat) {
+  cap <- capture_nll(params$alpha, params$beta, params$log_sigma, efdat)
+  abundance_nll(params, cap$log_P, efdat, ndat)$nll
 }

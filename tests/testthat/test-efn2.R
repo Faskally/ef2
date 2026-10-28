@@ -255,3 +255,71 @@ test_that("negative binomial abundance", {
   var_process <- M + (a$lambda * (1 - a$P))^2 * b / cc^2
   expect_equal(a$se^2, var_process + rowSums((D %*% m$Vp_joint) * D), tolerance = 1e-5)
 })
+
+test_that("the cut model keeps capture probability from the conditional likelihood", {
+  data <- prep_efn2_data()
+  m0 <- efp2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    data = data, pass = pass, id = sampleID)
+  m <- efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    abundance = ~ lifestage + siteID + offset(log(area)),
+    data = data, pass = pass, id = sampleID, cut = TRUE)
+
+  expect_true(m$cut)
+  expect_equal(coef(m), coef(m0), tolerance = 1e-6)
+  expect_equal(m$P, m0$P, tolerance = 1e-6)
+  expect_equal(m$sigma, m0$sigma, tolerance = 1e-5)
+  expect_true(is.na(m$aic))
+
+  # stage 2 is a Poisson GLM for the total catch with offset log(area P)
+  samples <- data[!duplicated(data$sampleID), ]
+  samples$catch <- as.vector(tapply(data$count, data$sampleID, sum))
+  samples$P <- m0$P[as.character(samples$sampleID)]
+  g <- glm(catch ~ lifestage + siteID + offset(log(area * P)), family = poisson, data = samples)
+  expect_equal(unname(m$coefficients_n), unname(coef(g)), tolerance = 1e-5)
+  # the standard errors allow for the uncertainty in capture probability
+  expect_true(all(diag(m$Vb_n) > diag(vcov(g))))
+
+  a <- abundance(m)
+  expect_equal(a$N, unname(m$N[as.character(a$id)]))
+  out <- capture.output(print(m))
+  expect_true(any(grepl("Cut model", out)))
+})
+
+test_that("the cut model variance agrees with simulation of capture probability", {
+  skip_on_cran()
+  data <- prep_efn2_data()
+  m0 <- efp2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    data = data, pass = pass, id = sampleID)
+  m <- efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    abundance = ~ lifestage + siteID + offset(log(area)),
+    data = data, pass = pass, id = sampleID, cut = TRUE)
+
+  samples <- data[!duplicated(data$sampleID), ]
+  samples$catch <- as.vector(tapply(data$count, data$sampleID, sum))
+  set.seed(1)
+  B <- 200
+  L <- chol(m0$Vp)
+  draws <- t(replicate(B, {
+    mb <- m0
+    mb$gam_coefficients[m0$gam_cols] <- m0$gam_coefficients[m0$gam_cols] +
+      drop(rnorm(length(m0$gam_cols)) %*% L)
+    samples$P <- capture_prob(mb)$P
+    g <- glm(catch ~ lifestage + siteID + offset(log(area * P)), family = poisson, data = samples)
+    c(coef(g), diag(vcov(g)))
+  }))
+  k <- length(m$coefficients_n)
+  simulated <- colMeans(draws[, k + seq_len(k)]) + (1 + 1 / B) * apply(draws[, seq_len(k)], 2, var)
+  expect_equal(unname(diag(m$Vb_n)), unname(simulated), tolerance = 0.05)
+})
+
+test_that("the cut model with abundance random effects and negative binomial", {
+  data <- prep_efn2_data()
+  m <- efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    abundance = ~ lifestage + s(siteID, bs = "re") + offset(log(area)),
+    distribution = "negbin", data = data, pass = pass, id = sampleID, cut = TRUE)
+  expect_equal(m$convergence, 0)
+  expect_true(is.matrix(m$Vp_joint))
+  expect_true(all(is.finite(diag(m$Vp_joint))))
+  a <- abundance(m, by = "year")
+  expect_true(all(a$se > 0))
+})

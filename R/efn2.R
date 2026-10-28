@@ -38,6 +38,20 @@
 #' The log likelihood includes the likelihood of the total catches, so it
 #' cannot be compared with that of a model fitted by \code{efp2}.
 #'
+#' With \code{cut = TRUE} the fit has two stages. Capture probability is
+#' estimated from the conditional likelihood, as in \code{efp2}, and the
+#' parameters for abundance are then estimated from the likelihood of the
+#' total catches with capture probability fixed. The covariance matrix of
+#' the abundance parameters allows for the uncertainty in capture
+#' probability: with \eqn{A} the Hessian of the abundance part of the
+#' negative log likelihood with respect to the abundance parameters,
+#' \eqn{C} its cross derivatives with respect to the capture parameters and
+#' \eqn{V_1} the covariance matrix of the capture parameters, the
+#' covariance matrix of the abundance parameters is \eqn{A^{-1} + A^{-1} C
+#' V_1 C^\top A^{-1}} (Murphy and Topel, 1985). This is conditional on the
+#' standard deviations of the random effects. The cut estimates do not
+#' maximise the joint likelihood, so there is no AIC.
+#'
 #' @inheritParams efp2
 #' @param formula a formula for logit capture probability, with the counts
 #'   on each pass as the response, as for \code{\link{efp2}}
@@ -48,6 +62,12 @@
 #' @param distribution the distribution of the number of fish in a sample,
 #'   \code{"poisson"} or \code{"negbin"}, the negative binomial with mean
 #'   \eqn{\lambda_s} and size \eqn{\theta}, which is estimated
+#' @param cut if TRUE, capture probability is estimated from the
+#'   conditional likelihood only, as in \code{\link{efp2}}, and the model for
+#'   abundance is then fitted with capture probability fixed, so that the
+#'   abundance model cannot influence capture probability ("cutting
+#'   feedback"). The uncertainty in capture probability is carried through
+#'   to the abundance parameters, see Details.
 #' @param offset an optional offset for the linear predictor of capture
 #'   probability. An offset for log abundance is given in \code{abundance}.
 #' @return If \code{fit = TRUE}, an object of class \code{efn2}, which
@@ -65,6 +85,10 @@
 #'     for capture probability and log abundance}
 #'   If \code{fit = FALSE}, the data that would be passed to the optimiser.
 #' @references
+#' Murphy, K. M. and Topel, R. H. (1985) Estimation and inference in two-step
+#' econometric models. Journal of Business and Economic Statistics, 3,
+#' 370-379. \doi{10.1080/07350015.1985.10509471}
+#'
 #' Dorazio, R. M., Jelks, H. L. and Jordan, F. (2005) Improving removal-based
 #' estimates of abundance by sampling a population of spatially distinct
 #' subpopulations. Biometrics, 61, 1093-1101.
@@ -85,7 +109,7 @@
 #' m1
 #' @export
 efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
-  distribution = c("poisson", "negbin"),
+  distribution = c("poisson", "negbin"), cut = FALSE,
   offset = NULL, verbose = FALSE, hessian = TRUE,
   fit = TRUE, control = list(), sparse = TRUE) {
 
@@ -154,10 +178,24 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   rand <- c("alpha", "alpha_n")[c(length(ms$blocks), length(msn$blocks)) > 0]
   if (!length(rand)) rand <- NULL
 
+  map <- list()
+  if (cut) {
+    # stage 1: capture probability from the conditional likelihood only
+    stage1 <- fit_capture(efdat, params[c("alpha", "beta", "log_sigma")],
+      random = if (length(ms$blocks)) "alpha", verbose = verbose,
+      control = control, hessian = hessian)
+    params[c("alpha", "beta", "log_sigma")] <- stage1$params
+    # stage 2: fix the capture parameters, so the abundance model cannot
+    # change capture probability
+    map <- lapply(params[c("alpha", "beta", "log_sigma")], function(x) factor(rep(NA, length(x))))
+    rand <- if (length(msn$blocks)) "alpha_n"
+  }
+
   obj <- MakeADFun(
     function(params) ef_nll_joint(params, efdat, ndat),
     params,
     random = rand,
+    map = map,
     silent = !verbose
   )
 
@@ -170,6 +208,12 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$llik <- -1 * as.numeric(obj$fn(opt$par))
   par_full <- obj$env$last.par
   out$rep <- obj$report(par_full)
+  # all the estimated parameters, for the cut model from both stages
+  pars <- opt$par
+  if (cut) {
+    pars <- c(stage1$opt$par, opt$par)
+    par_full <- c(stage1$par_full, par_full)
+  }
 
   # capture probability, in the order of the data
   ord_output <- order(id, pass)
@@ -201,7 +245,7 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   }
 
   labels <- c(
-    colnames(ms$X)[ms$fx_keep], ms$re_labels,
+    if (!cut) c(colnames(ms$X)[ms$fx_keep], ms$re_labels),
     colnames(msn$X)[msn$fx_keep], msn$re_labels,
     if (distribution == "negbin") "log(theta)"
   )
@@ -209,6 +253,12 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
     sdreport(obj, getJointPrecision = hessian && !is.null(rand))
   )
   check_sdreport(out$sdrep, labels)
+  out$cut <- cut
+  if (cut) {
+    # standard errors for capture probability are from stage 1
+    out$sdrep_capture <- stage1$sdrep
+    check_sdreport(stage1$sdrep, c(colnames(ms$X)[ms$fx_keep], ms$re_labels))
+  }
 
   out$data <- data
   out$offset <- offset
@@ -216,8 +266,9 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$abundance <- abundance
   out$terms <- ms$Gsetup$terms
   out$call <- match.call()
-  out$rank <- length(opt$par)
-  out$aic <- -2 * out$llik + 2 * out$rank
+  out$rank <- length(pars)
+  # the cut estimates do not maximise the joint likelihood, so there is no AIC
+  out$aic <- if (cut) NA else -2 * out$llik + 2 * out$rank
 
   # capture probability, with the same components as an efp2 fit
   out$G <- ms$G
@@ -226,11 +277,11 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$re_cols <- ms$re_cols
   out$gam_cols <- ms$gam_cols
   out$re_labels <- ms$re_labels
-  out$coefficients <- opt$par[names(opt$par) == "beta"]
+  out$coefficients <- pars[names(pars) == "beta"]
   names(out$coefficients) <- colnames(ms$X)[ms$fx_keep]
   out$random <- par_full[names(par_full) == "alpha"]
   names(out$random) <- colnames(ms$Z)
-  out$sigma <- exp(opt$par[names(opt$par) == "log_sigma"])
+  out$sigma <- exp(pars[names(pars) == "log_sigma"])
   names(out$sigma) <- ms$re_labels
   out$gam_coefficients <- drop(as.matrix(ms$to_gam %*% c(out$coefficients, out$random)))
   names(out$gam_coefficients) <- colnames(ms$G)
@@ -242,11 +293,11 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$gam_cols_n <- msn$gam_cols
   out$re_labels_n <- msn$re_labels
   out$offset_n <- offset_n
-  out$coefficients_n <- opt$par[names(opt$par) == "beta_n"]
+  out$coefficients_n <- pars[names(pars) == "beta_n"]
   names(out$coefficients_n) <- colnames(msn$X)[msn$fx_keep]
   out$random_n <- par_full[names(par_full) == "alpha_n"]
   names(out$random_n) <- colnames(msn$Z)
-  out$sigma_n <- exp(opt$par[names(opt$par) == "log_sigma_n"])
+  out$sigma_n <- exp(pars[names(pars) == "log_sigma_n"])
   names(out$sigma_n) <- msn$re_labels
   out$gam_coefficients_n <- drop(as.matrix(msn$to_gam %*% c(out$coefficients_n, out$random_n)))
   names(out$gam_coefficients_n) <- colnames(msn$G)
@@ -264,7 +315,10 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$Vb <- out$Vb_n <- out$Vp <- out$Vp_n <- out$Vp_joint <- NULL
   if (hessian) {
     # covariance of the fixed and random effects of both models
-    if (is.null(rand)) {
+    if (cut) {
+      V <- try(cut_covariance(stage1, obj, par_full, params, efdat, ndat), silent = TRUE)
+      if (!inherits(V, "try-error")) nms <- rownames(V)
+    } else if (is.null(rand)) {
       V <- try(solve(obj$he(opt$par)), silent = TRUE)
       nms <- names(opt$par)
     } else {
@@ -309,6 +363,76 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$convergence <- opt$convergence
   class(out) <- c("efn2", "efp2", "glm", "lm")
   out
+}
+
+# fit the conditional likelihood, as in efp2, for stage 1 of the cut model
+fit_capture <- function(efdat, params, random, verbose, control, hessian) {
+  obj <- MakeADFun(
+    function(params) ef_nll(params, efdat),
+    params,
+    random = random,
+    silent = !verbose
+  )
+  opt <- nlminb(obj$par, obj$fn, obj$gr, control = control)
+  if (opt$convergence != 0) {
+    warning("capture model has not converged: ", opt$message)
+  }
+  obj$fn(opt$par)
+  par_full <- obj$env$last.par
+  sdrep <- muffle_nan(sdreport(obj, getJointPrecision = hessian && !is.null(random)))
+
+  # covariance of the capture fixed and random effects
+  V <- NULL
+  if (hessian) {
+    if (is.null(random)) {
+      H <- obj$he(opt$par)
+      nms <- names(opt$par)
+    } else {
+      H <- sdrep$jointPrecision
+      nms <- rownames(H)
+    }
+    V <- solve(as.matrix(H))
+    keep <- c(which(nms == "beta"), which(nms == "alpha"))
+    V <- V[keep, keep, drop = FALSE]
+    dimnames(V) <- list(nms[keep], nms[keep])
+  }
+
+  params$alpha <- unname(par_full[names(par_full) == "alpha"])
+  params$beta <- unname(par_full[names(par_full) == "beta"])
+  params$log_sigma <- unname(par_full[names(par_full) == "log_sigma"])
+  list(params = params, opt = opt, par_full = par_full, sdrep = sdrep, V = V)
+}
+
+# the covariance matrix of the capture and abundance fixed and random
+# effects in the cut model. The abundance parameters theta2 (fixed effects,
+# random effects, and log(theta)) are estimated given the capture
+# parameters theta1 (fixed and random effects) from stage 1, with
+# covariance matrix V1. With A the Hessian of the abundance part of the
+# negative log likelihood with respect to theta2 and C the cross
+# derivatives with respect to theta1, the estimates of theta2 change by
+# -A^-1 C for a change in theta1, so
+#   var(theta2) = A^-1 + A^-1 C V1 C' A^-1, cov(theta2, theta1) = -A^-1 C V1
+# conditional on the standard deviations of the random effects.
+cut_covariance <- function(stage1, obj, par_full, params, efdat, ndat) {
+  # all the parameters at the estimates
+  for (nm in names(params)) {
+    params[[nm]] <- unname(par_full[names(par_full) == nm])
+  }
+  objH <- MakeADFun(function(p) cut_nll(p, efdat, ndat), params, silent = TRUE)
+  H <- objH$he(objH$par)
+  nms <- names(objH$par)
+  i1 <- c(which(nms == "beta"), which(nms == "alpha"))
+  i2 <- c(which(nms == "beta_n"), which(nms == "alpha_n"), which(nms == "log_theta"))
+  A <- H[i2, i2, drop = FALSE]
+  C <- H[i2, i1, drop = FALSE]
+  V1 <- stage1$V
+  Ainv <- solve(A)
+  ACV <- Ainv %*% C %*% V1
+  V22 <- Ainv + ACV %*% t(C) %*% Ainv
+  V21 <- -ACV
+  V <- rbind(cbind(V1, t(V21)), cbind(V21, V22))
+  dimnames(V) <- list(nms[c(i1, i2)], nms[c(i1, i2)])
+  V
 }
 
 # the expected number of fish not caught, given the total catch. For a

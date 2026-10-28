@@ -18,14 +18,31 @@ summary.efn2 <- function(object, ...) {
 
   # NaN standard errors are explained by the warning from efn2
   fx <- muffle_nan(summary(object$sdrep, "fixed", p.value = TRUE))
-  out$coefficients <- fx[rownames(fx) == "beta", , drop = FALSE]
+  # for the cut model, capture probability is from stage 1, and the
+  # standard errors for abundance allow for its uncertainty
+  fx_capture <- fx
+  re_capture <- NULL
+  if (isTRUE(object$cut)) {
+    fx_capture <- muffle_nan(summary(object$sdrep_capture, "fixed", p.value = TRUE))
+    re_capture <- muffle_nan(summary(object$sdrep_capture, "report", p.value = FALSE))
+  }
+  out$coefficients <- fx_capture[rownames(fx_capture) == "beta", , drop = FALSE]
   rownames(out$coefficients) <- names(object$coefficients)
   out$coefficients_n <- fx[rownames(fx) == "beta_n", , drop = FALSE]
   rownames(out$coefficients_n) <- names(object$coefficients_n)
+  if (isTRUE(object$cut) && is.matrix(object$Vb_n)) {
+    # standard errors allowing for the uncertainty in capture probability
+    se <- sqrt(diag(object$Vb_n))
+    z <- out$coefficients_n[, 1] / se
+    out$coefficients_n[, 2] <- se
+    out$coefficients_n[, 3] <- z
+    out$coefficients_n[, 4] <- 2 * stats::pnorm(-abs(z))
+  }
 
   re <- muffle_nan(summary(object$sdrep, "report", p.value = FALSE))
   if (length(object$sigma)) {
-    out$sigma <- re[rownames(re) == "sigma", , drop = FALSE]
+    out$sigma <- (if (is.null(re_capture)) re else re_capture)
+    out$sigma <- out$sigma[rownames(out$sigma) == "sigma", , drop = FALSE]
     rownames(out$sigma) <- paste("sigma", object$re_labels)
   }
   if (length(object$sigma_n)) {
@@ -38,6 +55,7 @@ summary.efn2 <- function(object, ...) {
     rownames(out$theta) <- "theta"
   }
   out$distribution <- object$distribution
+  out$cut <- isTRUE(object$cut)
   out$nsample <- length(object$catch)
   class(out) <- "summary.efn2"
   out
@@ -75,9 +93,14 @@ print.summary.efn2 <- function(x, digits = max(3L, getOption("digits") - 3L), ..
   }
 
   cat("Samples:", x$nsample, "\n")
-  cat("Log likelihood:", format(signif(as.numeric(x$logLik), digits)),
-    " AIC:", format(signif(x$aic, digits)), "\n")
-  cat("(not comparable with efp2, which uses the conditional likelihood)\n")
+  if (isTRUE(x$cut)) {
+    cat("Cut model: capture probability from the conditional likelihood, not\n")
+    cat("influenced by the model for abundance; no AIC\n")
+  } else {
+    cat("Log likelihood:", format(signif(as.numeric(x$logLik), digits)),
+      " AIC:", format(signif(x$aic, digits)), "\n")
+    cat("(not comparable with efp2, which uses the conditional likelihood)\n")
+  }
   invisible(x)
 }
 
