@@ -170,13 +170,13 @@ The effect of a smooth is plotted by predicting over its levels, with the other 
 
 ```{r}
 plot_effect <- function(x, pred, truth, xlab) {
-  lower <- invlogit(pred$fit - 2 * pred$se.fit)
-  upper <- invlogit(pred$fit + 2 * pred$se.fit)
-  plot(x, invlogit(pred$fit), type = "n", ylim = c(0.3, 0.9),
+  lower <- plogis(pred$fit - 2 * pred$se.fit)
+  upper <- plogis(pred$fit + 2 * pred$se.fit)
+  plot(x, plogis(pred$fit), type = "n", ylim = c(0.3, 0.9),
        xlab = xlab, ylab = "Capture probability")
   polygon(c(x, rev(x)), c(lower, rev(upper)), col = "grey85", border = NA)
-  lines(x, invlogit(pred$fit), lwd = 2)
-  lines(x, invlogit(truth), lty = 2, lwd = 2)
+  lines(x, plogis(pred$fit), lwd = 2)
+  lines(x, plogis(truth), lty = 2, lwd = 2)
 }
 random_effects <- c("s(visitID)", "s(sampleID)")
 ```
@@ -228,9 +228,9 @@ newdata <-
 pred_rw1 <- predict(m_doy_rw1, newdata = newdata, exclude = random_effects)
 pred_rw2 <- predict(m_doy_rw2, newdata = newdata, exclude = random_effects)
 
-plot(days, invlogit(pred_rw2), type = "l", lwd = 2, ylim = c(0.3, 0.9),
+plot(days, plogis(pred_rw2), type = "l", lwd = 2, ylim = c(0.3, 0.9),
      xlab = "Day of year", ylab = "Capture probability")
-lines(days, invlogit(pred_rw1), col = "grey50", lwd = 2)
+lines(days, plogis(pred_rw1), col = "grey50", lwd = 2)
 legend("topright", c("Second order", "First order"),
        col = c("black", "grey50"), lwd = 2, bty = "n")
 ```

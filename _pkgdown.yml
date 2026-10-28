@@ -15,11 +15,6 @@ reference:
   - predict.efp2
   - efp2-methods
   - as.gam
-- title: Utilities
-  contents:
-  - logit
-  - invlogit
-  - transpar
 - title: Data
   contents:
   - ef_data

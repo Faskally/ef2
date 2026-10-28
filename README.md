@@ -200,10 +200,10 @@ newdata <-
 pred <- predict(m1_smooth, newdata = newdata, se.fit = TRUE)
 year <- as.numeric(levels(ef_data$fyear))
 
-plot(year, invlogit(pred$fit), type = "b", pch = 16, ylim = c(0, 1),
+plot(year, plogis(pred$fit), type = "b", pch = 16, ylim = c(0, 1),
      xlab = "Year", ylab = "Capture probability")
-lines(year, invlogit(pred$fit - 2 * pred$se.fit), lty = 2)
-lines(year, invlogit(pred$fit + 2 * pred$se.fit), lty = 2)
+lines(year, plogis(pred$fit - 2 * pred$se.fit), lty = 2)
+lines(year, plogis(pred$fit + 2 * pred$se.fit), lty = 2)
 ```
 
 <img src="man/figures/README-smooth-year-1.png" alt="Line plot of capture probability by year from a first order random walk, with 95% confidence intervals"  />
@@ -275,10 +275,10 @@ newdata <-
   )
 pred <- predict(m1_doy, newdata = newdata, se.fit = TRUE)
 
-plot(days, invlogit(pred$fit), type = "l", ylim = c(0, 1),
+plot(days, plogis(pred$fit), type = "l", ylim = c(0, 1),
      xlab = "Day of year", ylab = "Capture probability")
-lines(days, invlogit(pred$fit - 2 * pred$se.fit), lty = 2)
-lines(days, invlogit(pred$fit + 2 * pred$se.fit), lty = 2)
+lines(days, plogis(pred$fit - 2 * pred$se.fit), lty = 2)
+lines(days, plogis(pred$fit + 2 * pred$se.fit), lty = 2)
 rug(ef_data$doy)
 ```
 

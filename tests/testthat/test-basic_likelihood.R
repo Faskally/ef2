@@ -248,7 +248,7 @@ test_that("prediction", {
     as.vector(predict(m2, newdata = ef_data, type = "response")),
     fitted(m2)
   )
-  expect_equal(as.vector(predict(m1)), logit(fitted(m1)))
+  expect_equal(as.vector(predict(m1)), qlogis(fitted(m1)))
   expect_equal(unname(predict(m2, type = "lpmatrix")), unname(m2$G))
 
   # new data
@@ -260,7 +260,7 @@ test_that("prediction", {
 
   # delta method on the response scale
   pred_p <- predict(m1, newdata = newdata, type = "response", se.fit = TRUE)
-  expect_equal(pred_p$fit, invlogit(pred$fit))
+  expect_equal(pred_p$fit, plogis(pred$fit))
   expect_equal(pred_p$se.fit, pred$se.fit * pred_p$fit * (1 - pred_p$fit))
 
   # random effects can be excluded, to predict for unobserved levels

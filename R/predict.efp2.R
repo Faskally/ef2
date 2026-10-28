@@ -40,7 +40,7 @@
 #' newdata <- data.frame(lifestage = c("Fry", "Parr"))
 #' predict(m1, newdata = newdata, type = "response", se.fit = TRUE)
 #'
-#' @importFrom stats predict model.frame model.matrix delete.response
+#' @importFrom stats predict model.frame model.matrix delete.response plogis
 #' @importFrom mgcv PredictMat
 #' @export
 predict.efp2 <- function(object, newdata = NULL,
@@ -72,7 +72,7 @@ predict.efp2 <- function(object, newdata = NULL,
   }
 
   if (type == "response") {
-    fit <- invlogit(fit)
+    fit <- plogis(fit)
     if (se.fit) {
       se <- se * fit * (1 - fit)
     }
