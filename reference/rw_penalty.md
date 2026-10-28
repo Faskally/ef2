@@ -94,16 +94,16 @@ m1
 #> 
 #> Formula:
 #> count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1))
-#> <environment: 0x55c2282d0ae8>
+#> <environment: 0x5646f7c41e08>
 #> 
 #> Random effects:
-#>               Estimate Std. Error
-#> sigma s(fdoy) 0.001289    0.01585
+#>                Estimate Std. Error
+#> sigma s(fdoy) 1.122e-05    0.01579
 #> 
 #> Coefficients:
 #>               Estimate Std. Error z value Pr(>|z^2|)
-#> (Intercept)     0.6820    0.07131   9.564  1.138e-21
-#> lifestageParr   0.6212    0.10292   6.036  1.577e-09
+#> (Intercept)     0.6820    0.07119   9.580  9.704e-22
+#> lifestageParr   0.6212    0.10291   6.036  1.579e-09
 #> 
 #> Degrees of Freedom: 90 Total (i.e. Null);  87 Residual
 #> AIC: 3194

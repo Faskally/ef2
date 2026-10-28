@@ -170,9 +170,9 @@ aic <- AIC(m_none, m_visit, m_sample, m_both)
 aic$delta <- aic$AIC - min(aic$AIC)
 aic
 #>          df      AIC      delta
-#> m_none    3 130792.4 2258.16949
-#> m_visit   4 128613.9   79.62552
-#> m_sample  4 128762.3  228.00072
+#> m_none    3 130792.4 2258.16960
+#> m_visit   4 128613.9   79.62565
+#> m_sample  4 128762.3  228.00084
 #> m_both    5 128534.3    0.00000
 ```
 
@@ -194,14 +194,14 @@ m_both
 #> 
 #> Random effects:
 #>                   Estimate Std. Error
-#> sigma s(visitID)    0.5645    0.02634
-#> sigma s(sampleID)   0.2592    0.02216
+#> sigma s(visitID)    0.5647    0.02634
+#> sigma s(sampleID)   0.2592    0.02215
 #> 
 #> Coefficients:
 #>               Estimate Std. Error z value Pr(>|z^2|)
-#> (Intercept)     0.2810    0.03404   8.257  1.493e-16
-#> lifestageParr   0.4760    0.02930  16.249  2.280e-59
-#> pass122        -0.3473    0.01951 -17.800  7.009e-71
+#> (Intercept)     0.2812    0.03404   8.261  1.449e-16
+#> lifestageParr   0.4760    0.02930  16.246  2.378e-59
+#> pass122        -0.3473    0.01951 -17.798  7.287e-71
 #> 
 #> Degrees of Freedom: 2700 Total (i.e. Null);  2695 Residual
 #> AIC: 128500
@@ -215,7 +215,7 @@ The estimated standard deviations are
 
 m_both$sigma
 #>  s(visitID) s(sampleID) 
-#>   0.5644852   0.2592115
+#>   0.5646856   0.2592496
 ```
 
 The standard deviation between samples is a little below the 0.3 used in

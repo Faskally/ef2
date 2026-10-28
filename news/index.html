@@ -44,6 +44,8 @@
 <h2 class="pkg-version" data-toc-text="2.0.0" id="ef2-200">ef2 2.0.0<a class="anchor" aria-label="anchor" href="#ef2-200"></a></h2>
 <ul><li>package renamed from ef to ef2 so it can be installed alongside ef 1.x; fitted models now have class <code>efp2</code>
 </li>
+<li>models are fitted with <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> rather than <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> (BFGS), which falsely converged on some platforms; <code>control</code> is passed to <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
+</li>
 </ul></div>
   </main></div>
 

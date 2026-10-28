@@ -205,10 +205,10 @@ aic <- AIC(m_base, m_year_linear, m_year_rw1, m_year_rw2)
 aic$delta <- aic$AIC - min(aic$AIC)
 aic
 #>               df      AIC     delta
-#> m_base         5 128534.3 85.831490
-#> m_year_linear  6 128529.9 81.500629
+#> m_base         5 128534.3 85.831413
+#> m_year_linear  6 128529.9 81.500668
 #> m_year_rw1     6 128448.4  0.000000
-#> m_year_rw2     7 128451.5  3.014801
+#> m_year_rw2     7 128451.5  3.014846
 ```
 
 A linear trend in year is hardly any better than no effect of year, but
@@ -248,9 +248,9 @@ aic <- AIC(m_year_rw1, m_doy_linear, m_doy_rw1, m_doy_rw2)
 aic$delta <- aic$AIC - min(aic$AIC)
 aic
 #>              df      AIC      delta
-#> m_year_rw1    6 128448.4 145.993541
-#> m_doy_linear  7 128382.9  80.476771
-#> m_doy_rw1     7 128304.9   2.402008
+#> m_year_rw1    6 128448.4 145.993525
+#> m_doy_linear  7 128382.9  80.476766
+#> m_doy_rw1     7 128304.9   2.401692
 #> m_doy_rw2     8 128302.4   0.000000
 ```
 
@@ -276,17 +276,17 @@ m_final
 #> 
 #> Random effects:
 #>                   Estimate Std. Error
-#> sigma s(fyear)    0.228265   0.050164
-#> sigma s(fdoy)     0.003158   0.001056
-#> sigma s(visitID)  0.348431   0.023263
-#> sigma s(sampleID) 0.258187   0.022093
+#> sigma s(fyear)    0.228191   0.050141
+#> sigma s(fdoy)     0.003155   0.001055
+#> sigma s(visitID)  0.348408   0.023265
+#> sigma s(sampleID) 0.258235   0.022093
 #> 
 #> Coefficients:
 #>               Estimate Std. Error z value Pr(>|z^2|)
-#> (Intercept)     1.1907    0.79613   1.496  1.348e-01
-#> lifestageParr   0.4756    0.02926  16.255  2.049e-59
-#> pass122        -0.3486    0.01952 -17.858  2.520e-71
-#> s(fdoy).null1   8.4172    6.30061   1.336  1.816e-01
+#> (Intercept)     1.1882    0.79550   1.494  1.353e-01
+#> lifestageParr   0.4756    0.02926  16.254  2.090e-59
+#> pass122        -0.3486    0.01952 -17.858  2.506e-71
+#> s(fdoy).null1   8.3960    6.29588   1.334  1.823e-01
 #> 
 #> Degrees of Freedom: 2700 Total (i.e. Null);  2692 Residual
 #> AIC: 128300
@@ -322,7 +322,7 @@ values used in the simulation.
 
 round(c(base = m_base$sigma[["s(visitID)"]], final = m_final$sigma[["s(visitID)"]]), 3)
 #>  base final 
-#> 0.564 0.348
+#> 0.565 0.348
 ```
 
 The effects of lifestage and pass were simulated as 0.5 and -0.4.

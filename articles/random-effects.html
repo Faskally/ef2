@@ -212,9 +212,9 @@ parameter, its standard deviation.</p>
 <span><span class="va">aic</span><span class="op">$</span><span class="va">delta</span> <span class="op">&lt;-</span> <span class="va">aic</span><span class="op">$</span><span class="va">AIC</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">aic</span><span class="op">$</span><span class="va">AIC</span><span class="op">)</span></span>
 <span><span class="va">aic</span></span>
 <span><span class="co">#&gt;          df      AIC      delta</span></span>
-<span><span class="co">#&gt; m_none    3 130792.4 2258.16949</span></span>
-<span><span class="co">#&gt; m_visit   4 128613.9   79.62552</span></span>
-<span><span class="co">#&gt; m_sample  4 128762.3  228.00072</span></span>
+<span><span class="co">#&gt; m_none    3 130792.4 2258.16960</span></span>
+<span><span class="co">#&gt; m_visit   4 128613.9   79.62565</span></span>
+<span><span class="co">#&gt; m_sample  4 128762.3  228.00084</span></span>
 <span><span class="co">#&gt; m_both    5 128534.3    0.00000</span></span></code></pre></div>
 <p>Both sources of variation are needed: the model with visit and sample
 random effects has the lowest AIC by a long way, and the model with no
@@ -232,14 +232,14 @@ random effects is much the worst.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
 <span><span class="co">#&gt;                   Estimate Std. Error</span></span>
-<span><span class="co">#&gt; sigma s(visitID)    0.5645    0.02634</span></span>
-<span><span class="co">#&gt; sigma s(sampleID)   0.2592    0.02216</span></span>
+<span><span class="co">#&gt; sigma s(visitID)    0.5647    0.02634</span></span>
+<span><span class="co">#&gt; sigma s(sampleID)   0.2592    0.02215</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;               Estimate Std. Error z value Pr(&gt;|z^2|)</span></span>
-<span><span class="co">#&gt; (Intercept)     0.2810    0.03404   8.257  1.493e-16</span></span>
-<span><span class="co">#&gt; lifestageParr   0.4760    0.02930  16.249  2.280e-59</span></span>
-<span><span class="co">#&gt; pass122        -0.3473    0.01951 -17.800  7.009e-71</span></span>
+<span><span class="co">#&gt; (Intercept)     0.2812    0.03404   8.261  1.449e-16</span></span>
+<span><span class="co">#&gt; lifestageParr   0.4760    0.02930  16.246  2.378e-59</span></span>
+<span><span class="co">#&gt; pass122        -0.3473    0.01951 -17.798  7.287e-71</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Degrees of Freedom: 2700 Total (i.e. Null);  2695 Residual</span></span>
 <span><span class="co">#&gt; AIC: 128500</span></span></code></pre></div>
@@ -251,7 +251,7 @@ random effects is much the worst.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_both</span><span class="op">$</span><span class="va">sigma</span></span>
 <span><span class="co">#&gt;  s(visitID) s(sampleID) </span></span>
-<span><span class="co">#&gt;   0.5644852   0.2592115</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.5646856   0.2592496</span></span></code></pre></div>
 <p>The standard deviation between samples is a little below the 0.3 used
 in the simulation, but the standard deviation between visits is well
 above 0.4. This is because the model has no terms for year or day of the
