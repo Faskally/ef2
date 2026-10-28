@@ -4,6 +4,8 @@
   fitted models now have class `efp2`
 * models are fitted with `nlminb()` rather than `optim()` (BFGS), which
   falsely converged on some platforms; `control` is passed to `nlminb()`
+* the likelihood is computed on the log scale, so it stays finite when
+  capture probabilities are close to 0 or 1
 
 # ef 2.0.0 (2026-10-09)
 

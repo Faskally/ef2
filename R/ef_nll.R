@@ -1,15 +1,18 @@
-# log likelihood of a single multipass electrofishing sample
-ll_sample <- function(p, y) {
+# log likelihood of a single multipass electrofishing sample, computed on
+# the log scale from the linear predictor so that it stays finite when
+# capture probabilities are close to 0 or 1
+ll_sample <- function(eta, y) {
   npasses <- length(y)
-  pi <- p
-  for (i in seq_len(npasses)[-1]) {
-    for (j in 1:(i - 1)) {
-      pi[i] <- pi[i] * (1 - p[j])
-    }
+  log_p <- -logspace_add(0 * eta, -eta)
+  log_q <- -logspace_add(0 * eta, eta) # log(1 - p)
+  # log probability of first capture on each pass
+  log_pi <- log_p
+  if (npasses > 1) {
+    log_pi[-1] <- log_p[-1] + cumsum(log_q)[-npasses]
   }
-  pos <- which(y > 0)
-  ll <- sum(y[pos] * log(pi[pos]))
-  ll - sum(y) * log(sum(pi))
+  # log probability of capture over all passes, log(1 - prod(1 - p))
+  log_P <- logspace_sub(0, sum(log_q))
+  sum(y * log_pi) - sum(y) * log_P
 }
 
 # negative log likelihood, the RTMB objective function
@@ -27,6 +30,7 @@ ef_nll <- function(params, efdat) {
   p <- 1 / (1 + exp(-eta))
   idx <- split(seq_along(efdat$y), efdat$sample_id)
   ps <- unname(lapply(idx, function(i) p[i]))
+  etas <- unname(lapply(idx, function(i) eta[i]))
   ys <- lapply(idx, function(i) efdat$y[i])
 
   nll <- 0 # negative log likelihood
@@ -51,7 +55,7 @@ ef_nll <- function(params, efdat) {
   }
 
   for (i in seq_along(idx)) {
-    nll <- nll - ll_sample(ps[[i]], ys[[i]])
+    nll <- nll - ll_sample(etas[[i]], ys[[i]])
   }
 
   # delta method for sigma
