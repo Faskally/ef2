@@ -2,7 +2,7 @@ Modelling Capture Probability
 ================
 9 October 2026
 
-[![R-CMD-check](https://github.com/Faskally/ef/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Faskally/ef/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/Faskally/ef2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Faskally/ef2/actions/workflows/R-CMD-check.yaml)
 
 ## the model
 
@@ -41,13 +41,13 @@ fished and the cumulative capture probability: $T_s / (A_s P_s)$.
 To install the `ef` package from r-universe run
 
 ``` r
-install.packages("ef", repos = c('https://faskally.r-universe.dev', 'https://cloud.r-project.org'))
+install.packages("ef2", repos = c('https://faskally.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 or to install the latest development version from GitHub run
 
 ``` r
-remotes::install_github("faskally/ef")
+remotes::install_github("faskally/ef2")
 ```
 
 # Create Required Fields for Analysis

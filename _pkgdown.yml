@@ -25,7 +25,7 @@ reference:
   - ef_data
 - title: Package
   contents:
-  - ef-package
+  - ef2-package
 
 articles:
 - title: Worked examples
