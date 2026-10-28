@@ -72,7 +72,7 @@ rw_penalty(1:5, order = 2)
 #>            [,1]          [,2]
 #> [1,] -0.4472136 -6.324555e-01
 #> [2,] -0.4472136 -3.162278e-01
-#> [3,] -0.4472136 -7.177699e-18
+#> [3,] -0.4472136  8.326673e-17
 #> [4,] -0.4472136  3.162278e-01
 #> [5,] -0.4472136  6.324555e-01
 
@@ -94,7 +94,7 @@ m1
 #> 
 #> Formula:
 #> count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1))
-#> <environment: 0x55d703c65678>
+#> <environment: 0x559af7801dc0>
 #> 
 #> Random effects:
 #>                Estimate Std. Error

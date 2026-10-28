@@ -8,7 +8,7 @@ probability, see
 ## Usage
 
 ``` r
-abundance(object, newdata = NULL, area = NULL, level = 0.95)
+abundance(object, newdata = NULL, area = NULL, by = NULL, level = 0.95)
 ```
 
 ## Arguments
@@ -27,7 +27,14 @@ abundance(object, newdata = NULL, area = NULL, level = 0.95)
 
   an optional name of a column in the data giving the area fished, or a
   vector of areas with one value per row of the data. If given, density
-  (abundance per unit area) is also returned.
+  (abundance per unit area) is also returned. With `by`, the area must
+  be the same for all samples in a group.
+
+- by:
+
+  an optional character vector of the names of variables in the data,
+  which must be the same for all passes of a sample. Abundance is summed
+  over the samples with each combination of their values.
 
 - level:
 
@@ -39,7 +46,9 @@ a data.frame with one row per sample, in the order the samples first
 appear in the data, with columns `id`, `catch` the total catch, `P`, `N`
 the estimated abundance, its standard error `se`, and confidence limits
 `lower` and `upper`. If `area` is given there are also columns `area`,
-`density`, `density_lower` and `density_upper`.
+`density`, `density_lower` and `density_upper`. With `by` there is one
+row per group, sorted by the `by` variables, with the `by` variables and
+`nsample`, the number of samples, in place of `id` and `P`.
 
 ## Details
 
@@ -50,6 +59,15 @@ the catch, given \\P\\, and the uncertainty in the estimate of \\P\\
 intervals are computed on the log scale, and the lower limit is not less
 than the total catch. When the total catch is zero the estimated
 abundance is zero and the confidence limits are `NA`.
+
+With `by`, abundance is summed over the samples in each group, for
+example over the lifestages caught at a site in a year. The binomial
+variation is independent between samples, but the estimates of \\P\\ are
+correlated, as they depend on the same model coefficients, and this is
+allowed for: \$\$\textrm{var}(\sum_s \hat N_s) \approx \sum_s \hat N_s
+(1 - P_s) / P_s + w^\top \Sigma w,\$\$ where \\w_s = \hat N_s (1 -
+P_s)\\ and \\\Sigma\\ is the covariance matrix of
+\\\textrm{logit}(P_s)\\.
 
 ## References
 
@@ -71,13 +89,13 @@ ef2_data <- ef2_data[order(ef2_data$sampleID, ef2_data$pass), ]
 m1 <- efp2(count ~ lifestage + pass12, data = ef2_data,
   pass = pass, id = sampleID)
 head(abundance(m1, area = "area"))
-#>   id catch         P        se          N lower      upper area    density
-#> 1  1    49 0.9460482 1.8495074  51.794403    49  55.549234  122 0.42454429
-#> 2  2    42 0.9858539 0.7975209  42.602661    42  44.194802  122 0.34920214
-#> 3  3    10 0.9460482 0.7888318  10.570286    10  12.235159  227 0.04656514
-#> 4  4   132 0.9858539 1.4715777 133.894076   132 136.809604  227 0.58984174
-#> 5  5     5 0.9460482 0.5534132   5.285143     5   6.489138  228 0.02318045
-#> 6  6    64 0.9858539 0.9944564  64.918340    64  66.896993  228 0.28472956
+#>   id catch         P          N        se lower      upper area    density
+#> 1  1    49 0.9460482  51.794403 1.8495074    49  55.549234  122 0.42454429
+#> 2  2    42 0.9858539  42.602661 0.7975209    42  44.194802  122 0.34920214
+#> 3  3    10 0.9460482  10.570286 0.7888318    10  12.235159  227 0.04656514
+#> 4  4   132 0.9858539 133.894076 1.4715777   132 136.809604  227 0.58984174
+#> 5  5     5 0.9460482   5.285143 0.5534132     5   6.489138  228 0.02318045
+#> 6  6    64 0.9858539  64.918340 0.9944564    64  66.896993  228 0.28472956
 #>   density_lower density_upper
 #> 1    0.40163934    0.45532159
 #> 2    0.34426230    0.36225248
@@ -85,4 +103,21 @@ head(abundance(m1, area = "area"))
 #> 4    0.58149780    0.60268548
 #> 5    0.02192982    0.02846113
 #> 6    0.28070175    0.29340787
+
+# summed over lifestages for each site and year
+head(abundance(m1, area = "area", by = c("siteID", "year")))
+#>   siteID year nsample catch         N       se    lower     upper area
+#> 1  Site1 2011       2    91  94.39706 2.044479  91.0000  98.49043  122
+#> 2  Site1 2012       2   181 189.57232 3.635209 182.5797 196.83278  122
+#> 3  Site1 2013       2   136 140.08545 2.261193 136.0000 144.58816  122
+#> 4  Site1 2014       2   119 123.86583 2.531473 119.0023 128.92813  122
+#> 5  Site1 2015       2    98 101.75358 2.167267  98.0000 106.09126  124
+#> 6  Site2 2011       2   157 162.79521 2.804362 157.3905 168.38550  264
+#>     density density_lower density_upper
+#> 1 0.7737464     0.7459016     0.8072986
+#> 2 1.5538715     1.4965547     1.6133835
+#> 3 1.1482414     1.1147541     1.1851488
+#> 4 1.0152937     0.9754286     1.0567880
+#> 5 0.8205934     0.7903226     0.8555747
+#> 6 0.6166485     0.5961762     0.6378239
 ```

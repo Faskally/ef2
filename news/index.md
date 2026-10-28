@@ -30,5 +30,6 @@
   and
   [`abundance()`](https://faskally.github.io/ef2/reference/abundance.md)
   give the cumulative capture probability, abundance and density of each
-  sample with confidence intervals; the cumulative capture probability
-  is also reported in `$P`
+  sample with confidence intervals, optionally summed over groups of
+  samples with `by`; the cumulative capture probability is also reported
+  in `$P`

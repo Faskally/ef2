@@ -54,7 +54,7 @@
 <code>as.gam()</code> is renamed <code><a href="../reference/as.gam2.html">as.gam2()</a></code> and <code>ef_data</code> is renamed <code>ef2_data</code>, so no names clash with ef</li>
 <li>fix the choice of coefficients removed for the null space of a smooth, which could give a singular penalty and NaN likelihood on macOS</li>
 <li>when standard errors cannot be computed, <code><a href="../reference/efp2.html">efp2()</a></code> warns which parameters are affected, instead of “NaNs produced”</li>
-<li>new <code><a href="../reference/capture_prob.html">capture_prob()</a></code> and <code><a href="../reference/abundance.html">abundance()</a></code> give the cumulative capture probability, abundance and density of each sample with confidence intervals; the cumulative capture probability is also reported in <code>$P</code>
+<li>new <code><a href="../reference/capture_prob.html">capture_prob()</a></code> and <code><a href="../reference/abundance.html">abundance()</a></code> give the cumulative capture probability, abundance and density of each sample with confidence intervals, optionally summed over groups of samples with <code>by</code>; the cumulative capture probability is also reported in <code>$P</code>
 </li>
 </ul></div>
   </main></div>

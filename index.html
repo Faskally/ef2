@@ -123,7 +123,7 @@
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="do">## Formula:</span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="do">## count ~ siteID + fyear + pass12 + lifestage</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="do">## &lt;environment: 0x5577755fd210&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="do">## No random effects</span></span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="do">## </span></span>
@@ -169,7 +169,7 @@
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="do">## Formula:</span></span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="do">## count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + </span></span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="do">##     pass12 + lifestage</span></span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="do">## &lt;environment: 0x5577755fd210&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
 <span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="do">## Random effects:</span></span>
 <span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="do">##                Estimate Std. Error</span></span>
@@ -227,7 +227,7 @@
 <span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="do">## Formula:</span></span>
 <span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="do">## count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + </span></span>
 <span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="do">##     pass12 + lifestage</span></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="do">## &lt;environment: 0x5577755fd210&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
 <span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="do">## Random effects:</span></span>
 <span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="do">##                Estimate Std. Error</span></span>
@@ -289,13 +289,13 @@
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dens</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/abundance.html">abundance</a></span><span class="op">(</span><span class="va">m1</span>, area <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dens</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="do">##   id catch         P       se         N    lower     upper area   density</span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="do">## 1  2    42 0.9838939 0.892726  42.68753  42.0000  44.47359  122 0.3498978</span></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="do">## 2  1    49 0.9457095 2.047553  51.81295  49.0000  55.98559  122 0.4246963</span></span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="do">## 3 29   140 0.9210062 5.329788 152.00766 141.9123 162.82116  122 1.2459644</span></span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="do">## 4 30    41 0.9745545 1.141402  42.07050  41.0000  44.36816  122 0.3448402</span></span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="do">## 5 16    86 0.9855114 1.238831  87.26434  86.0000  89.72650  122 0.7152815</span></span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="do">## 6 15    50 0.9502933 1.940101  52.61533  50.0000  56.55864  122 0.4312732</span></span>
+<div class="sourceCode" id="cb21"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="do">##   id catch         P         N       se    lower     upper area   density</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="do">## 1  2    42 0.9838939  42.68753 0.892726  42.0000  44.47359  122 0.3498978</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="do">## 2  1    49 0.9457095  51.81295 2.047553  49.0000  55.98559  122 0.4246963</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="do">## 3 29   140 0.9210062 152.00766 5.329788 141.9123 162.82116  122 1.2459644</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="do">## 4 30    41 0.9745545  42.07050 1.141402  41.0000  44.36816  122 0.3448402</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="do">## 5 16    86 0.9855114  87.26434 1.238831  86.0000  89.72650  122 0.7152815</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="do">## 6 15    50 0.9502933  52.61533 1.940101  50.0000  56.55864  122 0.4312732</span></span>
 <span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="do">##   density_lower density_upper</span></span>
 <span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="do">## 1     0.3442623     0.3645377</span></span>
 <span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="do">## 2     0.4016393     0.4588983</span></span>
@@ -303,8 +303,34 @@
 <span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="do">## 4     0.3360656     0.3636734</span></span>
 <span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a><span class="do">## 5     0.7049180     0.7354631</span></span>
 <span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a><span class="do">## 6     0.4098361     0.4635954</span></span></code></pre></div>
-<p>To model counts directly, for example with a Poisson model, the offset is <span class="math inline">\log(A P)</span></p>
+<p>Abundance can be summed over samples using <code>by</code>, for example over the fry and parr at each site in each year, or over all the sites in each year. The confidence intervals allow for the correlation between the estimates of <span class="math inline">P</span>, which depend on the same model coefficients</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">site_year</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/abundance.html">abundance</a></span><span class="op">(</span><span class="va">m1</span>, area <span class="op">=</span> <span class="st">"area"</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"siteID"</span>, <span class="st">"year"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">site_year</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="do">##   siteID year nsample catch         N       se    lower     upper area</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="do">## 1  Site1 2011       2    91  94.50048 2.356786  91.0000  99.23445  122</span></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="do">## 2  Site1 2012       2   181 194.07817 5.702209 183.2177 205.58235  122</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="do">## 3  Site1 2013       2   136 139.87967 2.468399 136.0000 144.80228  122</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="do">## 4  Site1 2014       2   119 121.34350 1.798448 119.0000 124.92009  122</span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="do">## 5  Site1 2015       2    98 101.89283 2.600999  98.0000 107.12037  124</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="do">## 6  Site2 2011       2   157 162.12955 3.031428 157.0000 168.18125  264</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="do">##     density density_lower density_upper</span></span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="do">## 1 0.7745941     0.7459016     0.8133972</span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="do">## 2 1.5908046     1.5017848     1.6851012</span></span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="do">## 3 1.1465547     1.1147541     1.1869040</span></span>
+<span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a><span class="do">## 4 0.9946188     0.9754098     1.0239351</span></span>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a><span class="do">## 5 0.8217164     0.7903226     0.8638740</span></span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a><span class="do">## 6 0.6141271     0.5946970     0.6370502</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/abundance.html">abundance</a></span><span class="op">(</span><span class="va">m1</span>, by <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="do">##   year nsample catch        N        se    lower    upper</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="do">## 1 2011       6   355 368.0506  5.889016 356.6874 379.7757</span></span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="do">## 2 2012       6   688 734.4195 14.606285 706.3425 763.6125</span></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="do">## 3 2013       6   473 482.8034  4.484568 474.0934 491.6735</span></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="do">## 4 2014       6   493 501.3551  4.028927 493.5204 509.3141</span></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="do">## 5 2015       6   273 280.4354  4.017294 273.0000 288.4207</span></span></code></pre></div>
+<p>To model counts directly, for example with a Poisson model, the offset is <span class="math inline">\log(A P)</span></p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dens</span><span class="op">$</span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dens</span><span class="op">$</span><span class="va">area</span> <span class="op">*</span> <span class="va">dens</span><span class="op">$</span><span class="va">P</span><span class="op">)</span></span></code></pre></div>
 <p>Plot to check</p>
 <p><img src="reference/figures/README-density-1.png" alt="Estimated fish density by year for fry and parr at each site, with 95% confidence intervals"></p>
@@ -314,80 +340,80 @@
 </h1>
 <p>Electrofishing count data are typically overdispersed: capture probability varies between visits to a site, and between samples within a visit, by more than the covariates can explain. This variation is included in the model using random effects, which are specified by adding <code>s(f, bs = "re")</code> terms to the formula, where <code>f</code> is a factor.</p>
 <p>The sampleID needs to be a factor to be used as a random effect</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ef2_data</span><span class="op">$</span><span class="va">fsampleID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">ef2_data</span><span class="op">$</span><span class="va">sampleID</span><span class="op">)</span></span></code></pre></div>
 <p>Fit a model with visit and sample random effects</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mfull</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">siteID</span> <span class="op">+</span> <span class="va">year</span> <span class="op">+</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span></span>
 <span>               <span class="fu">s</span><span class="op">(</span><span class="va">visitID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">fsampleID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
 <span>             data <span class="op">=</span> <span class="va">ef2_data</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mfull</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="do">## Call:</span></span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="do">## efp2(formula = count ~ siteID + year + lifestage + pass12 + s(visitID, </span></span>
-<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="do">##     bs = "re") + s(fsampleID, bs = "re"), data = ef2_data, pass = pass, </span></span>
-<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="do">##     id = sampleID)</span></span>
-<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a><span class="do">## Formula:</span></span>
-<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="do">## count ~ siteID + year + lifestage + pass12 + s(visitID, bs = "re") + </span></span>
-<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="do">##     s(fsampleID, bs = "re")</span></span>
-<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a><span class="do">## &lt;environment: 0x5577755fd210&gt;</span></span>
-<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a><span class="do">## Random effects:</span></span>
-<span id="cb25-13"><a href="#cb25-13" tabindex="-1"></a><span class="do">##                     Estimate Std. Error</span></span>
-<span id="cb25-14"><a href="#cb25-14" tabindex="-1"></a><span class="do">## sigma s(visitID)   5.965e-05    0.06556</span></span>
-<span id="cb25-15"><a href="#cb25-15" tabindex="-1"></a><span class="do">## sigma s(fsampleID) 7.591e-02    0.17106</span></span>
-<span id="cb25-16"><a href="#cb25-16" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb25-17"><a href="#cb25-17" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb25-18"><a href="#cb25-18" tabindex="-1"></a><span class="do">##                Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
-<span id="cb25-19"><a href="#cb25-19" tabindex="-1"></a><span class="do">## (Intercept)    0.648110     0.1775  3.65176  2.605e-04</span></span>
-<span id="cb25-20"><a href="#cb25-20" tabindex="-1"></a><span class="do">## siteIDSite2    0.079488     0.1418  0.56064  5.750e-01</span></span>
-<span id="cb25-21"><a href="#cb25-21" tabindex="-1"></a><span class="do">## siteIDSite3   -0.016539     0.1553 -0.10648  9.152e-01</span></span>
-<span id="cb25-22"><a href="#cb25-22" tabindex="-1"></a><span class="do">## year2012      -0.208321     0.1793 -1.16174  2.453e-01</span></span>
-<span id="cb25-23"><a href="#cb25-23" tabindex="-1"></a><span class="do">## year2013       0.042289     0.1926  0.21953  8.262e-01</span></span>
-<span id="cb25-24"><a href="#cb25-24" tabindex="-1"></a><span class="do">## year2014       0.362184     0.1895  1.91137  5.596e-02</span></span>
-<span id="cb25-25"><a href="#cb25-25" tabindex="-1"></a><span class="do">## year2015      -0.002674     0.2168 -0.01234  9.902e-01</span></span>
-<span id="cb25-26"><a href="#cb25-26" tabindex="-1"></a><span class="do">## lifestageParr  0.588609     0.1251  4.70513  2.537e-06</span></span>
-<span id="cb25-27"><a href="#cb25-27" tabindex="-1"></a><span class="do">## pass122       -0.235586     0.1318 -1.78694  7.395e-02</span></span>
-<span id="cb25-28"><a href="#cb25-28" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb25-29"><a href="#cb25-29" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  79 Residual</span></span>
-<span id="cb25-30"><a href="#cb25-30" tabindex="-1"></a><span class="do">## AIC: 3192</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="do">## Call:</span></span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="do">## efp2(formula = count ~ siteID + year + lifestage + pass12 + s(visitID, </span></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="do">##     bs = "re") + s(fsampleID, bs = "re"), data = ef2_data, pass = pass, </span></span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="do">##     id = sampleID)</span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="do">## Formula:</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="do">## count ~ siteID + year + lifestage + pass12 + s(visitID, bs = "re") + </span></span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="do">##     s(fsampleID, bs = "re")</span></span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="do">## &lt;environment: 0x5ff25a9f7210&gt;</span></span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="do">## Random effects:</span></span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="do">##                     Estimate Std. Error</span></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="do">## sigma s(visitID)   5.965e-05    0.06556</span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="do">## sigma s(fsampleID) 7.591e-02    0.17106</span></span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="do">##                Estimate Std. Error  z value Pr(&gt;|z^2|)</span></span>
+<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="do">## (Intercept)    0.648110     0.1775  3.65176  2.605e-04</span></span>
+<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="do">## siteIDSite2    0.079488     0.1418  0.56064  5.750e-01</span></span>
+<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a><span class="do">## siteIDSite3   -0.016539     0.1553 -0.10648  9.152e-01</span></span>
+<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a><span class="do">## year2012      -0.208321     0.1793 -1.16174  2.453e-01</span></span>
+<span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a><span class="do">## year2013       0.042289     0.1926  0.21953  8.262e-01</span></span>
+<span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a><span class="do">## year2014       0.362184     0.1895  1.91137  5.596e-02</span></span>
+<span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a><span class="do">## year2015      -0.002674     0.2168 -0.01234  9.902e-01</span></span>
+<span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a><span class="do">## lifestageParr  0.588609     0.1251  4.70513  2.537e-06</span></span>
+<span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a><span class="do">## pass122       -0.235586     0.1318 -1.78694  7.395e-02</span></span>
+<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a><span class="do">## Degrees of Freedom: 90 Total (i.e. Null);  79 Residual</span></span>
+<span id="cb29-30"><a href="#cb29-30" tabindex="-1"></a><span class="do">## AIC: 3192</span></span></code></pre></div>
 <p>The estimated standard deviations of the visit and sample random effects (on the logit scale) are</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mfull</span><span class="op">$</span><span class="va">sigma</span></span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="do">##   s(visitID) s(fsampleID) </span></span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="do">## 5.965191e-05 7.591194e-02</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="do">##   s(visitID) s(fsampleID) </span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="do">## 5.965191e-05 7.591194e-02</span></span></code></pre></div>
 <p>Because the random effects are part of the likelihood, models can be compared directly using AIC</p>
 <ul>
 <li>Full model</li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">mfull</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb29"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="do">## [1] 3192.252</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="do">## [1] 3192.252</span></span></code></pre></div>
 <ul>
 <li>Model without lifestage</li>
 </ul>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mlife</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">siteID</span> <span class="op">+</span> <span class="va">year</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span></span>
 <span>               <span class="fu">s</span><span class="op">(</span><span class="va">visitID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">fsampleID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
 <span>             data <span class="op">=</span> <span class="va">ef2_data</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">mlife</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb31"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="do">## [1] 3206.62</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="do">## [1] 3206.62</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="contributing">contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
 </h2>
 <p>After making changes to the code, run:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>to update help files and the NAMESPACE</p>
 <p>then</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>to check for errors, and fix warnings and notes</p>
 <p>Finally, the readme can be rebuilt using</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">rmarkdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">render</a></span><span class="op">(</span><span class="st">"README.Rmd"</span><span class="op">)</span></span></code></pre></div>
 <p>then changes can be commited and pushed.</p>
 </div>

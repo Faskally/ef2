@@ -113,7 +113,7 @@ summary(m1)
 #> 
 #> Formula:
 #> count ~ lifestage
-#> <environment: 0x55d6faa36ac0>
+#> <environment: 0x559afd09e6e8>
 #> 
 #> No random effects
 #> 

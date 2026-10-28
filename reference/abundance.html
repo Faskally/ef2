@@ -53,7 +53,7 @@ probability, see <code><a href="capture_prob.html">capture_prob</a></code>.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">abundance</span><span class="op">(</span><span class="va">object</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, area <span class="op">=</span> <span class="cn">NULL</span>, level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">abundance</span><span class="op">(</span><span class="va">object</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, area <span class="op">=</span> <span class="cn">NULL</span>, by <span class="op">=</span> <span class="cn">NULL</span>, level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,7 +72,14 @@ which must also contain the counts used as the response in the model</p></dd>
 <dt id="arg-area">area<a class="anchor" aria-label="anchor" href="#arg-area"></a></dt>
 <dd><p>an optional name of a column in the data giving the area
 fished, or a vector of areas with one value per row of the data. If
-given, density (abundance per unit area) is also returned.</p></dd>
+given, density (abundance per unit area) is also returned. With
+<code>by</code>, the area must be the same for all samples in a group.</p></dd>
+
+
+<dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
+<dd><p>an optional character vector of the names of variables in the
+data, which must be the same for all passes of a sample. Abundance is
+summed over the samples with each combination of their values.</p></dd>
 
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
@@ -86,7 +93,10 @@ first appear in the data, with columns <code>id</code>, <code>catch</code> the
 total catch, <code>P</code>, <code>N</code> the estimated abundance, its standard
 error <code>se</code>, and confidence limits <code>lower</code> and <code>upper</code>.
 If <code>area</code> is given there are also columns <code>area</code>,
-<code>density</code>, <code>density_lower</code> and <code>density_upper</code>.</p>
+<code>density</code>, <code>density_lower</code> and <code>density_upper</code>. With
+<code>by</code> there is one row per group, sorted by the <code>by</code>
+variables, with the <code>by</code> variables and <code>nsample</code>, the number
+of samples, in place of <code>id</code> and <code>P</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -98,6 +108,15 @@ $$\textrm{var}(\hat N) \approx \hat N (1 - P) / P +
 Confidence intervals are computed on the log scale, and the lower limit
 is not less than the total catch. When the total catch is zero the
 estimated abundance is zero and the confidence limits are <code>NA</code>.</p>
+<p>With <code>by</code>, abundance is summed over the samples in each group, for
+example over the lifestages caught at a site in a year. The binomial
+variation is independent between samples, but the estimates of \(P\)
+are correlated, as they depend on the same model coefficients, and this
+is allowed for:
+$$\textrm{var}(\sum_s \hat N_s) \approx \sum_s \hat N_s (1 - P_s) / P_s +
+  w^\top \Sigma w,$$
+where \(w_s = \hat N_s (1 - P_s)\) and \(\Sigma\) is the covariance
+matrix of \(\textrm{logit}(P_s)\).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -118,13 +137,13 @@ Biometrika, 76, 133-140. <a href="https://doi.org/10.1093/biomet/76.1.133" class
 <span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span>, data <span class="op">=</span> <span class="va">ef2_data</span>,</span></span>
 <span class="r-in"><span>  pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">abundance</span><span class="op">(</span><span class="va">m1</span>, area <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   id catch         P        se          N lower      upper area    density</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1    49 0.9460482 1.8495074  51.794403    49  55.549234  122 0.42454429</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2    42 0.9858539 0.7975209  42.602661    42  44.194802  122 0.34920214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3    10 0.9460482 0.7888318  10.570286    10  12.235159  227 0.04656514</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4   132 0.9858539 1.4715777 133.894076   132 136.809604  227 0.58984174</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  5     5 0.9460482 0.5534132   5.285143     5   6.489138  228 0.02318045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  6    64 0.9858539 0.9944564  64.918340    64  66.896993  228 0.28472956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   id catch         P          N        se lower      upper area    density</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1    49 0.9460482  51.794403 1.8495074    49  55.549234  122 0.42454429</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  2    42 0.9858539  42.602661 0.7975209    42  44.194802  122 0.34920214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3    10 0.9460482  10.570286 0.7888318    10  12.235159  227 0.04656514</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  4   132 0.9858539 133.894076 1.4715777   132 136.809604  227 0.58984174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  5     5 0.9460482   5.285143 0.5534132     5   6.489138  228 0.02318045</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  6    64 0.9858539  64.918340 0.9944564    64  66.896993  228 0.28472956</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   density_lower density_upper</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    0.40163934    0.45532159</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    0.34426230    0.36225248</span>
@@ -132,6 +151,23 @@ Biometrika, 76, 133-140. <a href="https://doi.org/10.1093/biomet/76.1.133" class
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4    0.58149780    0.60268548</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5    0.02192982    0.02846113</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6    0.28070175    0.29340787</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># summed over lifestages for each site and year</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">abundance</span><span class="op">(</span><span class="va">m1</span>, area <span class="op">=</span> <span class="st">"area"</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"siteID"</span>, <span class="st">"year"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   siteID year nsample catch         N       se    lower     upper area</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Site1 2011       2    91  94.39706 2.044479  91.0000  98.49043  122</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Site1 2012       2   181 189.57232 3.635209 182.5797 196.83278  122</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Site1 2013       2   136 140.08545 2.261193 136.0000 144.58816  122</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Site1 2014       2   119 123.86583 2.531473 119.0023 128.92813  122</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Site1 2015       2    98 101.75358 2.167267  98.0000 106.09126  124</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Site2 2011       2   157 162.79521 2.804362 157.3905 168.38550  264</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     density density_lower density_upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.7737464     0.7459016     0.8072986</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1.5538715     1.4965547     1.6133835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 1.1482414     1.1147541     1.1851488</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 1.0152937     0.9754286     1.0567880</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.8205934     0.7903226     0.8555747</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.6166485     0.5961762     0.6378239</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

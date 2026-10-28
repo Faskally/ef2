@@ -283,10 +283,10 @@ m_final
 #> 
 #> Coefficients:
 #>               Estimate Std. Error z value Pr(>|z^2|)
-#> (Intercept)     1.1882    0.79551   1.494  1.353e-01
+#> (Intercept)     1.1882    0.79549   1.494  1.353e-01
 #> lifestageParr   0.4756    0.02926  16.254  2.090e-59
 #> pass122        -0.3486    0.01952 -17.858  2.506e-71
-#> s(fdoy).null1   8.3960    6.29598   1.334  1.824e-01
+#> s(fdoy).null1   8.3960    6.29585   1.334  1.823e-01
 #> 
 #> Degrees of Freedom: 2700 Total (i.e. Null);  2692 Residual
 #> AIC: 128300
