@@ -1,0 +1,20 @@
+replicates: 100  converged: 100 
+
+estimated / true abundance, mean (sd) over replicates
+      plugin          lognormal       true_P         
+total 0.9821 (0.0055) 0.9924 (0.0059) 1.0001 (0.0012)
+Q1    0.9302 (0.0135) 0.9501 (0.0143) 0.9996 (0.0039)
+Q2    0.9993 (0.0067) 1.0095 (0.0071) 1.0003 (0.0023)
+Q3    1.0053 (0.0031) 1.0110 (0.0034) 1.0003 (0.0016)
+Q4    1.0044 (0.0013) 1.0070 (0.0015) 1.0000 (0.0008)
+
+coverage of 95% realised intervals
+   plugin lognormal 
+    0.912     0.924 
+
+random effect standard deviations (true 0.4 visit, 0.3 sample)
+  s(visitID) s(fsampleID) 
+       0.387        0.284 
+
+slope of estimated on true logit(P): 0.817 
+
