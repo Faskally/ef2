@@ -340,7 +340,10 @@ efp2 <- function(formula, data = NULL, pass = pass, id = id,
   )
   
   fx_pars <- grep("beta", names(opt$par))
-  out$sdrep <- sdreport(obj, getJointPrecision = hessian && length(blocks) > 0)
+  out$sdrep <- muffle_nan(
+    sdreport(obj, getJointPrecision = hessian && length(blocks) > 0)
+  )
+  check_sdreport(out$sdrep, c(colnames(X)[fx_keep], re_labels))
   # keep data for re-fitting
   # efdat needs to be reordered to be compatible with other structures 
   out$data <- data

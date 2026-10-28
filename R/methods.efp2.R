@@ -90,13 +90,14 @@ summary.efp2 <- function(object, ...) {
   out <- object[c("call", "formula", "aic", "df.null", "df.residual", "convergence")]
   out$logLik <- logLik(object)
 
-  fx <- summary(object$sdrep, "fixed", p.value = TRUE)
+  # NaN standard errors are explained by the warning from efp2
+  fx <- muffle_nan(summary(object$sdrep, "fixed", p.value = TRUE))
   fx <- fx[rownames(fx) == "beta", , drop = FALSE]
   rownames(fx) <- names(object$coefficients)
   out$coefficients <- fx
 
   if (length(object$sigma)) {
-    re <- summary(object$sdrep, "report", p.value = FALSE)
+    re <- muffle_nan(summary(object$sdrep, "report", p.value = FALSE))
     re <- re[rownames(re) == "sigma", , drop = FALSE]
     rownames(re) <- paste("sigma", object$re_labels)
     out$sigma <- re
