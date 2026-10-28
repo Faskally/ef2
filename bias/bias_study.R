@@ -88,6 +88,22 @@ res <- Filter(Negate(is.null), res)
 dir.create("bias/results", showWarnings = FALSE)
 saveRDS(res, "bias/results/bias_study.rds")
 
+# one row per replicate, for the article vignettes/articles/abundance-bias.Rmd
+per_rep <- do.call(rbind, lapply(res, function(r) {
+  ratio <- r$ratio
+  data.frame(
+    seed = r$seed,
+    t(setNames(as.vector(ratio), as.vector(outer(rownames(ratio), colnames(ratio), paste, sep = "_")))),
+    coverage_plugin = r$coverage[["plugin"]],
+    coverage_lognormal = r$coverage[["lognormal"]],
+    sigma_visit = unname(r$sigma[1]),
+    sigma_sample = unname(r$sigma[2]),
+    slope = r$slope,
+    check.names = FALSE
+  )
+}))
+write.csv(per_rep, "vignettes/articles/abundance-bias.csv", row.names = FALSE)
+
 cat("replicates:", length(res), " converged:", sum(sapply(res, `[[`, "converged")), "\n\n")
 
 ratios <- simplify2array(lapply(res, `[[`, "ratio"))
