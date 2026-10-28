@@ -2,7 +2,7 @@
 
 A set of functions to estimate capture probabilities and densities from
 multipass removal (electrofishing) data. The main function is
-[`efp`](https://faskally.github.io/ef2/reference/efp.md), which fits a
+[`efp2`](https://faskally.github.io/ef2/reference/efp2.md), which fits a
 model for capture probability, and predictions of capture probability
 are available from
 [`predict.efp2`](https://faskally.github.io/ef2/reference/predict.efp2.md).

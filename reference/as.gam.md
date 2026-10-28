@@ -1,9 +1,9 @@
-# Conversion of an efp fit to a gam fit for plotting
+# Conversion of an efp2 fit to a gam fit for plotting
 
-Converts an efp fit to a gam object, so that the plotting and prediction
-tools in the `mgcv` package can be used. The coefficients and their
-variances are those estimated by `efp`, but the smoothing parameters and
-effective degrees of freedom in the gam object are not.
+Converts an efp2 fit to a gam object, so that the plotting and
+prediction tools in the `mgcv` package can be used. The coefficients and
+their variances are those estimated by `efp2`, but the smoothing
+parameters and effective degrees of freedom in the gam object are not.
 
 ## Usage
 
@@ -15,7 +15,7 @@ as.gam(object)
 
 - object:
 
-  an efp fitted model
+  an efp2 fitted model
 
 ## Value
 
@@ -35,12 +35,12 @@ conversion, see
 data(ef_data)
 ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
                                  ef_data$lifestage, ef_data$species))
-m1 <- efp(count ~ lifestage + s(doy, k = 3),
+m1 <- efp2(count ~ lifestage + s(doy, k = 3),
           data = ef_data, pass = pass, id = sampleID)
 
 m1_gam <- as.gam(m1)
 #> Note that, although predictions and plots will be correct
-#>  the smoothing parameters and degrees of freedom in the gam object are not those estimated by efp!
+#>  the smoothing parameters and degrees of freedom in the gam object are not those estimated by efp2!
 plot(m1_gam)
 
 ```

@@ -3,7 +3,7 @@
 Creates a first or second order random walk penalty matrix for the
 levels of an ordered covariate, for use with the Markov random field
 (mrf) basis of `mgcv`. This is the recommended way to include smooth
-terms in [`efp`](https://faskally.github.io/ef2/reference/efp.md): the
+terms in [`efp2`](https://faskally.github.io/ef2/reference/efp2.md): the
 basis and the penalty are both sparse, so models are quick to fit even
 when there are many levels.
 
@@ -37,8 +37,8 @@ A first order random walk (`order = 1`) penalises the differences
 between neighbouring levels, and shrinks towards a constant. A second
 order random walk (`order = 2`) penalises the second differences, and
 shrinks towards a linear trend. In both cases the standard deviation
-estimated by [`efp`](https://faskally.github.io/ef2/reference/efp.md) is
-the standard deviation of the steps of the random walk, on the logit
+estimated by [`efp2`](https://faskally.github.io/ef2/reference/efp2.md)
+is the standard deviation of the steps of the random walk, on the logit
 scale.
 
 To use the penalty, the covariate must be a factor with the same levels
@@ -84,17 +84,17 @@ days <- min(ef_data$doy):max(ef_data$doy)
 ef_data$fdoy <- factor(ef_data$doy, levels = days)
 rw1 <- rw_penalty(days)
 
-m1 <- efp(count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)),
+m1 <- efp2(count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)),
           data = ef_data, pass = pass, id = sampleID)
 m1
 #> 
 #> Call:
-#> efp(formula = count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)), 
+#> efp2(formula = count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)), 
 #>     data = ef_data, pass = pass, id = sampleID)
 #> 
 #> Formula:
 #> count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1))
-#> <environment: 0x55fe22d84058>
+#> <environment: 0x563be2d1f910>
 #> 
 #> Random effects:
 #>                Estimate Std. Error

@@ -11,3 +11,9 @@
   [`nlminb()`](https://rdrr.io/r/stats/nlminb.html)
 - the likelihood is computed on the log scale, so it stays finite when
   capture probabilities are close to 0 or 1
+- `efp()` is renamed
+  [`efp2()`](https://faskally.github.io/ef2/reference/efp2.md), so ef
+  and ef2 can be attached together
+- remove `logit()`, `invlogit()` and `transpar()`, use
+  [`qlogis()`](https://rdrr.io/r/stats/Logistic.html) and
+  [`plogis()`](https://rdrr.io/r/stats/Logistic.html) from stats instead

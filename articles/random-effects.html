@@ -185,19 +185,19 @@ between visits and 0.3 between samples.</p>
 models are compared, all with fixed effects for lifestage and pass:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># no random effects</span></span>
-<span><span class="va">m_none</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp.html">efp</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span>,</span>
+<span><span class="va">m_none</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span>,</span>
 <span>              data <span class="op">=</span> <span class="va">ef_sim</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># variation between visits</span></span>
-<span><span class="va">m_visit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp.html">efp</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">visitID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span><span class="va">m_visit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">visitID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
 <span>               data <span class="op">=</span> <span class="va">ef_sim</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># variation between samples</span></span>
-<span><span class="va">m_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp.html">efp</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">sampleID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span><span class="va">m_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">sampleID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
 <span>                data <span class="op">=</span> <span class="va">ef_sim</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># variation between visits, and between samples within visits</span></span>
-<span><span class="va">m_both</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp.html">efp</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span></span>
+<span><span class="va">m_both</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/efp2.html">efp2</a></span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">lifestage</span> <span class="op">+</span> <span class="va">pass12</span> <span class="op">+</span></span>
 <span>                <span class="fu">s</span><span class="op">(</span><span class="va">visitID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">sampleID</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
 <span>              data <span class="op">=</span> <span class="va">ef_sim</span>, pass <span class="op">=</span> <span class="va">pass</span>, id <span class="op">=</span> <span class="va">sampleID</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -223,7 +223,7 @@ random effects is much the worst.</p>
 <code class="sourceCode R"><span><span class="va">m_both</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; efp(formula = count ~ lifestage + pass12 + s(visitID, bs = "re") + </span></span>
+<span><span class="co">#&gt; efp2(formula = count ~ lifestage + pass12 + s(visitID, bs = "re") + </span></span>
 <span><span class="co">#&gt;     s(sampleID, bs = "re"), data = ef_sim, pass = pass, id = sampleID)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula:</span></span>

@@ -177,23 +177,23 @@ second order random walks.
 ``` r
 
 m_base <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_year_linear <-
-  efp(count ~ lifestage + pass12 + year_s +
+  efp2(count ~ lifestage + pass12 + year_s +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_year_rw1 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_year_rw2 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw2_year)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
@@ -222,20 +222,20 @@ linear trend and as first and second order random walks.
 ``` r
 
 m_doy_linear <-
-  efp(count ~ lifestage + pass12 + doy_s +
+  efp2(count ~ lifestage + pass12 + doy_s +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_doy_rw1 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(fdoy, bs = "mrf", xt = list(penalty = rw1_doy)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_doy_rw2 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(fdoy, bs = "mrf", xt = list(penalty = rw2_doy)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
@@ -264,7 +264,7 @@ m_final <- m_doy_rw2
 m_final
 #> 
 #> Call:
-#> efp(formula = count ~ lifestage + pass12 + s(fyear, bs = "mrf", 
+#> efp2(formula = count ~ lifestage + pass12 + s(fyear, bs = "mrf", 
 #>     xt = list(penalty = rw1_year)) + s(fdoy, bs = "mrf", xt = list(penalty = rw2_doy)) + 
 #>     s(visitID, bs = "re") + s(sampleID, bs = "re"), data = ef_sim, 
 #>     pass = pass, id = sampleID)
@@ -351,13 +351,13 @@ the other covariates held fixed and the random effects left out using
 ``` r
 
 plot_effect <- function(x, pred, truth, xlab) {
-  lower <- invlogit(pred$fit - 2 * pred$se.fit)
-  upper <- invlogit(pred$fit + 2 * pred$se.fit)
-  plot(x, invlogit(pred$fit), type = "n", ylim = c(0.3, 0.9),
+  lower <- plogis(pred$fit - 2 * pred$se.fit)
+  upper <- plogis(pred$fit + 2 * pred$se.fit)
+  plot(x, plogis(pred$fit), type = "n", ylim = c(0.3, 0.9),
        xlab = xlab, ylab = "Capture probability")
   polygon(c(x, rev(x)), c(lower, rev(upper)), col = "grey85", border = NA)
-  lines(x, invlogit(pred$fit), lwd = 2)
-  lines(x, invlogit(truth), lty = 2, lwd = 2)
+  lines(x, plogis(pred$fit), lwd = 2)
+  lines(x, plogis(truth), lty = 2, lwd = 2)
 }
 random_effects <- c("s(visitID)", "s(sampleID)")
 ```
@@ -423,9 +423,9 @@ newdata <-
 pred_rw1 <- predict(m_doy_rw1, newdata = newdata, exclude = random_effects)
 pred_rw2 <- predict(m_doy_rw2, newdata = newdata, exclude = random_effects)
 
-plot(days, invlogit(pred_rw2), type = "l", lwd = 2, ylim = c(0.3, 0.9),
+plot(days, plogis(pred_rw2), type = "l", lwd = 2, ylim = c(0.3, 0.9),
      xlab = "Day of year", ylab = "Capture probability")
-lines(days, invlogit(pred_rw1), col = "grey50", lwd = 2)
+lines(days, plogis(pred_rw1), col = "grey50", lwd = 2)
 legend("topright", c("Second order", "First order"),
        col = c("black", "grey50"), lwd = 2, bty = "n")
 ```

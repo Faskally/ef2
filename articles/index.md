@@ -2,8 +2,8 @@
 
 ### Worked examples
 
-Worked examples of efp() using simulated data, so that the estimates can
-be compared with the truth.
+Worked examples of efp2() using simulated data, so that the estimates
+can be compared with the truth.
 
 - [Simulating electrofishing
   data](https://faskally.github.io/ef2/articles/simulating-data.md):

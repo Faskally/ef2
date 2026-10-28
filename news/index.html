@@ -47,6 +47,9 @@
 <li>models are fitted with <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> rather than <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> (BFGS), which falsely converged on some platforms; <code>control</code> is passed to <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>
 </li>
 <li>the likelihood is computed on the log scale, so it stays finite when capture probabilities are close to 0 or 1</li>
+<li>
+<code>efp()</code> is renamed <code><a href="../reference/efp2.html">efp2()</a></code>, so ef and ef2 can be attached together</li>
+<li>remove <code>logit()</code>, <code>invlogit()</code> and <code>transpar()</code>, use <code><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">qlogis()</a></code> and <code><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis()</a></code> from stats instead</li>
 </ul></div>
   </main></div>
 

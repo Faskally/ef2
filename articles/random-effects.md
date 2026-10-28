@@ -141,19 +141,19 @@ lifestage and pass:
 ``` r
 
 # no random effects
-m_none <- efp(count ~ lifestage + pass12,
+m_none <- efp2(count ~ lifestage + pass12,
               data = ef_sim, pass = pass, id = sampleID)
 
 # variation between visits
-m_visit <- efp(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+m_visit <- efp2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
                data = ef_sim, pass = pass, id = sampleID)
 
 # variation between samples
-m_sample <- efp(count ~ lifestage + pass12 + s(sampleID, bs = "re"),
+m_sample <- efp2(count ~ lifestage + pass12 + s(sampleID, bs = "re"),
                 data = ef_sim, pass = pass, id = sampleID)
 
 # variation between visits, and between samples within visits
-m_both <- efp(count ~ lifestage + pass12 +
+m_both <- efp2(count ~ lifestage + pass12 +
                 s(visitID, bs = "re") + s(sampleID, bs = "re"),
               data = ef_sim, pass = pass, id = sampleID)
 ```
@@ -185,7 +185,7 @@ random effects is much the worst.
 m_both
 #> 
 #> Call:
-#> efp(formula = count ~ lifestage + pass12 + s(visitID, bs = "re") + 
+#> efp2(formula = count ~ lifestage + pass12 + s(visitID, bs = "re") + 
 #>     s(sampleID, bs = "re"), data = ef_sim, pass = pass, id = sampleID)
 #> 
 #> Formula:

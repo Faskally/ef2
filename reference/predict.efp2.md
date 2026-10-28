@@ -1,6 +1,6 @@
-# Predict capture probabilities from an efp fit
+# Predict capture probabilities from an efp2 fit
 
-Predictions of capture probability from a fitted `efp` model, for the
+Predictions of capture probability from a fitted `efp2` model, for the
 data used to fit the model or for new data.
 
 ## Usage
@@ -21,7 +21,7 @@ predict(
 
 - object:
 
-  an efp fitted model
+  an efp2 fitted model
 
 - newdata:
 
@@ -65,8 +65,8 @@ which are interpolated. Standard errors on the response scale are
 calculated using the delta method.
 
 The `offset` supplied to
-[`efp`](https://faskally.github.io/ef2/reference/efp.md) is included in
-the predictions only when `newdata` is NULL.
+[`efp2`](https://faskally.github.io/ef2/reference/efp2.md) is included
+in the predictions only when `newdata` is NULL.
 
 ## Examples
 
@@ -74,7 +74,7 @@ the predictions only when `newdata` is NULL.
 data(ef_data)
 ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
                                  ef_data$lifestage, ef_data$species))
-m1 <- efp(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
+m1 <- efp2(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
 
 newdata <- data.frame(lifestage = c("Fry", "Parr"))
 predict(m1, newdata = newdata, type = "response", se.fit = TRUE)

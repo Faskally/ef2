@@ -105,7 +105,7 @@ further details.
 ``` r
 
 m1 <-
-  efp(
+  efp2(
     count ~ siteID + fyear + pass12 + lifestage,
     data = ef_data, pass = pass, id = sampleID
   )
@@ -114,7 +114,7 @@ m1 <-
 ``` R
 ## 
 ## Call:
-## efp(formula = count ~ siteID + fyear + pass12 + lifestage, data = ef_data, 
+## efp2(formula = count ~ siteID + fyear + pass12 + lifestage, data = ef_data, 
 ##     pass = pass, id = sampleID)
 ## 
 ## Formula:
@@ -166,7 +166,7 @@ over years.
 rw1 <- rw_penalty(levels(ef_data$fyear), order = 1)
 
 m1_smooth <-
-  efp(
+  efp2(
     count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) +
       pass12 + lifestage,
     data = ef_data, pass = pass, id = sampleID
@@ -176,7 +176,7 @@ m1_smooth <-
 ``` R
 ## 
 ## Call:
-## efp(formula = count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
+## efp2(formula = count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
 ##     pass12 + lifestage, data = ef_data, pass = pass, id = sampleID)
 ## 
 ## Formula:
@@ -216,10 +216,10 @@ newdata <-
 pred <- predict(m1_smooth, newdata = newdata, se.fit = TRUE)
 year <- as.numeric(levels(ef_data$fyear))
 
-plot(year, invlogit(pred$fit), type = "b", pch = 16, ylim = c(0, 1),
+plot(year, plogis(pred$fit), type = "b", pch = 16, ylim = c(0, 1),
      xlab = "Year", ylab = "Capture probability")
-lines(year, invlogit(pred$fit - 2 * pred$se.fit), lty = 2)
-lines(year, invlogit(pred$fit + 2 * pred$se.fit), lty = 2)
+lines(year, plogis(pred$fit - 2 * pred$se.fit), lty = 2)
+lines(year, plogis(pred$fit + 2 * pred$se.fit), lty = 2)
 ```
 
 ![Line plot of capture probability by year from a first order random
@@ -253,7 +253,7 @@ ef_data$fdoy <- factor(ef_data$doy, levels = days)
 rw2 <- rw_penalty(days, order = 2)
 
 m1_doy <-
-  efp(
+  efp2(
     count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) +
       pass12 + lifestage,
     data = ef_data, pass = pass, id = sampleID
@@ -263,7 +263,7 @@ m1_doy <-
 ``` R
 ## 
 ## Call:
-## efp(formula = count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
+## efp2(formula = count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
 ##     pass12 + lifestage, data = ef_data, pass = pass, id = sampleID)
 ## 
 ## Formula:
@@ -300,10 +300,10 @@ newdata <-
   )
 pred <- predict(m1_doy, newdata = newdata, se.fit = TRUE)
 
-plot(days, invlogit(pred$fit), type = "l", ylim = c(0, 1),
+plot(days, plogis(pred$fit), type = "l", ylim = c(0, 1),
      xlab = "Day of year", ylab = "Capture probability")
-lines(days, invlogit(pred$fit - 2 * pred$se.fit), lty = 2)
-lines(days, invlogit(pred$fit + 2 * pred$se.fit), lty = 2)
+lines(days, plogis(pred$fit - 2 * pred$se.fit), lty = 2)
+lines(days, plogis(pred$fit + 2 * pred$se.fit), lty = 2)
 rug(ef_data$doy)
 ```
 
@@ -428,7 +428,7 @@ Fit a model with visit and sample random effects
 
 ``` r
 
-mfull <- efp(count ~ siteID + year + lifestage + pass12 +
+mfull <- efp2(count ~ siteID + year + lifestage + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
              data = ef_data, pass = pass, id = sampleID)
 
@@ -438,7 +438,7 @@ mfull
 ``` R
 ## 
 ## Call:
-## efp(formula = count ~ siteID + year + lifestage + pass12 + s(visitID, 
+## efp2(formula = count ~ siteID + year + lifestage + pass12 + s(visitID, 
 ##     bs = "re") + s(fsampleID, bs = "re"), data = ef_data, pass = pass, 
 ##     id = sampleID)
 ## 
@@ -498,7 +498,7 @@ AIC(mfull)
 
 ``` r
 
-mlife <- efp(count ~ siteID + year + pass12 +
+mlife <- efp2(count ~ siteID + year + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
              data = ef_data, pass = pass, id = sampleID)
 
