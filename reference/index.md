@@ -1,0 +1,50 @@
+# Package index
+
+## Fitting models
+
+Estimate capture probability from multipass electrofishing data.
+
+- [`efp()`](https://faskally.github.io/ef2/reference/efp.md) : Estimate
+  capture probabilities from electrofishing data
+- [`rw_penalty()`](https://faskally.github.io/ef2/reference/rw_penalty.md)
+  : Random walk penalties for smooth terms
+
+## Predictions and summaries
+
+- [`predict(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/predict.efp2.md)
+  : Predict capture probabilities from an efp fit
+- [`fitted(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`vcov(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`confint(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`logLik(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`formula(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`summary(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`print(`*`<summary.efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`residuals(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`anova(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`plot(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`model.matrix(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  [`print(`*`<efp2>`*`)`](https://faskally.github.io/ef2/reference/efp-methods.md)
+  : Methods for efp fits
+- [`as.gam()`](https://faskally.github.io/ef2/reference/as.gam.md) :
+  Conversion of an efp fit to a gam fit for plotting
+
+## Utilities
+
+- [`logit()`](https://faskally.github.io/ef2/reference/logit.md) :
+  Logistic transformation
+- [`invlogit()`](https://faskally.github.io/ef2/reference/invlogit.md) :
+  Inverse logistic transformation
+- [`transpar()`](https://faskally.github.io/ef2/reference/transpar.md) :
+  Utility function to convert parameters to probabilities
+
+## Data
+
+- [`ef_data`](https://faskally.github.io/ef2/reference/ef_data.md) :
+  Counts of salmon fry and parr from electrofishing.
+
+## Package
+
+- [`ef2-package`](https://faskally.github.io/ef2/reference/ef2-package.md)
+  [`ef2`](https://faskally.github.io/ef2/reference/ef2-package.md) :
+  Modelling Framework for the Estimation of Salmonid Abundance
