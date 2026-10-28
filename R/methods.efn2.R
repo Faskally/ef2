@@ -33,6 +33,11 @@ summary.efn2 <- function(object, ...) {
     rownames(out$sigma_n) <- paste("sigma", object$re_labels_n)
   }
 
+  if (identical(object$distribution, "negbin")) {
+    out$theta <- re[rownames(re) == "theta", , drop = FALSE]
+    rownames(out$theta) <- "theta"
+  }
+  out$distribution <- object$distribution
   out$nsample <- length(object$catch)
   class(out) <- "summary.efn2"
   out
@@ -63,6 +68,11 @@ print.summary.efn2 <- function(x, digits = max(3L, getOption("digits") - 3L), ..
   # [[ rather than $, which would partially match sigma to sigma_n
   section("Capture probability (logit scale):", x[["formula"]], x[["sigma"]], x[["coefficients"]])
   section("Abundance (log scale):", x[["abundance"]], x[["sigma_n"]], x[["coefficients_n"]])
+  if (!is.null(x[["theta"]])) {
+    cat("Negative binomial size:\n")
+    print(x[["theta"]], digits = digits, ...)
+    cat("\n")
+  }
 
   cat("Samples:", x$nsample, "\n")
   cat("Log likelihood:", format(signif(as.numeric(x$logLik), digits)),

@@ -97,11 +97,13 @@ ef_nll <- function(params, efdat) {
 
 # joint negative log likelihood of the catches and the number of fish, the
 # RTMB objective function for efn2. The number of fish in sample s is
-# Poisson with mean lambda_s, so the total catch is Poisson with mean
-# lambda_s P_s, and the catches given the total catch are multinomial as in
-# ef_nll. The likelihood is the product of the two.
+# Poisson (or negative binomial) with mean lambda_s, so the total catch is
+# Poisson (or negative binomial with the same size) with mean lambda_s P_s,
+# and the catches given the total catch are multinomial as in ef_nll. The
+# likelihood is the product of the two.
 #   ndat: the model for log(lambda), with one row per sample, in the order
-#     of the levels of efdat$sample_id, and y the total catch of each sample
+#     of the levels of efdat$sample_id, y the total catch of each sample,
+#     and distribution "poisson" or "negbin"
 ef_nll_joint <- function(params, efdat, ndat) {
   cap <- capture_nll(params$alpha, params$beta, params$log_sigma, efdat)
 
@@ -109,13 +111,26 @@ ef_nll_joint <- function(params, efdat, ndat) {
   sigma_n <- exp(params$log_sigma_n)
   nll <- cap$nll + re_nll(params$alpha_n, sigma_n, ndat$blocks)
 
-  # Poisson total catch, with mean lambda P
+  # the total catch has mean lambda P, and is Poisson if the number of fish
+  # is Poisson, or negative binomial with size theta if the number of fish
+  # is negative binomial
+  y <- ndat$y
   log_mu <- log_lambda + cap$log_P
-  nll <- nll - sum(ndat$y * log_mu - exp(log_mu) - lgamma(ndat$y + 1))
+  if (identical(ndat$distribution, "negbin")) {
+    theta <- exp(params$log_theta)
+    log_theta_mu <- logspace_add(params$log_theta + 0 * log_mu, log_mu)
+    nll <- nll - sum(
+      lgamma(y + theta) - lgamma(theta) - lgamma(y + 1) +
+        theta * (params$log_theta - log_theta_mu) + y * (log_mu - log_theta_mu)
+    )
+    REPORT(theta)
+    ADREPORT(theta)
+  } else {
+    nll <- nll - sum(y * log_mu - exp(log_mu) - lgamma(y + 1))
+  }
   # the multinomial coefficients, which are left out of the conditional
-  # likelihood, so that this is the log likelihood of independent Poisson
-  # catches on each pass
-  nll <- nll - (sum(lgamma(ndat$y + 1)) - sum(lgamma(efdat$y + 1)))
+  # likelihood, so that this is the full log likelihood of the catches
+  nll <- nll - (sum(lgamma(y + 1)) - sum(lgamma(efdat$y + 1)))
 
   P <- exp(cap$log_P)
   lambda <- exp(log_lambda)

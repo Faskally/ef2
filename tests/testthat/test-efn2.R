@@ -180,3 +180,78 @@ test_that("abundance from an efn2 fit", {
   expect_gt(z$N, 0)
   expect_true(z$lower >= 0 && z$upper > z$N)
 })
+
+test_that("the negative binomial likelihood tends to the Poisson", {
+  data <- prep_efn2_data()
+  dat <- efn2(count ~ lifestage + pass12, abundance = ~ lifestage + offset(log(area)),
+    data = data, pass = pass, id = sampleID, distribution = "negbin", fit = FALSE)
+  params <- list(
+    alpha = numeric(0), beta = c(0.5, 0.3, -0.2), log_sigma = numeric(0),
+    alpha_n = numeric(0), beta_n = c(-1, 0.2), log_sigma_n = numeric(0),
+    log_theta = 20
+  )
+  nb <- ef2:::ef_nll_joint(params, dat$efdat, dat$ndat)
+  dat$ndat$distribution <- "poisson"
+  pois <- ef2:::ef_nll_joint(params, dat$efdat, dat$ndat)
+  expect_equal(nb, pois, tolerance = 1e-6)
+})
+
+test_that("the expected number not caught interpolates between efp2 and Poisson", {
+  catch <- c(10, 40)
+  lambda <- c(30, 50)
+  P <- c(0.6, 0.9)
+  expect_equal(ef2:::expected_missed(catch, lambda, P), lambda * (1 - P))
+  expect_equal(ef2:::expected_missed(catch, lambda, P, theta = 1e8), lambda * (1 - P),
+    tolerance = 1e-6)
+  expect_equal(ef2:::expected_missed(catch, lambda, P, theta = 1e-8), catch * (1 - P) / P,
+    tolerance = 1e-6)
+})
+
+test_that("negative binomial abundance", {
+  data <- prep_efn2_data()
+  m0 <- efp2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    data = data, pass = pass, id = sampleID)
+  # the model that is degenerate with Poisson abundance
+  expect_no_warning(
+    m <- efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+      abundance = ~ lifestage + s(siteID, bs = "re") + offset(log(area)),
+      distribution = "negbin", data = data, pass = pass, id = sampleID)
+  )
+  expect_equal(m$convergence, 0)
+  expect_gt(min(m$P), 0.5)
+  expect_equal(m$P, m0$P, tolerance = 0.02)
+  expect_equal(m$N, m$catch + ef2:::expected_missed(m$catch, m$lambda, m$P, m$theta))
+  expect_true(any(grepl("Negative binomial size", capture.output(print(m)))))
+
+  # the variance, with a finite difference gradient including log(theta)
+  a <- abundance(m)
+  missed <- function(object) {
+    cp <- capture_prob(object)
+    sdata <- object$data[!duplicated(object$data$sampleID), ]
+    Xn <- ef2:::efp_lpmatrix(list(Gsetup = object$Gsetup_n, G = object$G_n), sdata)
+    lambda <- exp(drop(Xn %*% object$gam_coefficients_n) + log(sdata$area))
+    ef2:::expected_missed(a$catch, lambda, cp$P, object$theta)
+  }
+  h <- 1e-6
+  grad <- function(component, cols) {
+    sapply(cols, function(j) {
+      up <- down <- m
+      up[[component]][j] <- up[[component]][j] + h
+      down[[component]][j] <- down[[component]][j] - h
+      (missed(up) - missed(down)) / (2 * h)
+    })
+  }
+  up <- down <- m
+  up$theta <- m$theta * exp(h)
+  down$theta <- m$theta * exp(-h)
+  D <- cbind(
+    grad("gam_coefficients", m$gam_cols),
+    grad("gam_coefficients_n", m$gam_cols_n),
+    (missed(up) - missed(down)) / (2 * h)
+  )
+  M <- a$N - a$catch
+  b <- m$theta + a$catch
+  cc <- m$theta + a$lambda * a$P
+  var_process <- M + (a$lambda * (1 - a$P))^2 * b / cc^2
+  expect_equal(a$se^2, var_process + rowSums((D %*% m$Vp_joint) * D), tolerance = 1e-5)
+})

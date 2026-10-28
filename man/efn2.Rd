@@ -10,6 +10,7 @@ efn2(
   data = NULL,
   pass = pass,
   id = id,
+  distribution = c("poisson", "negbin"),
   offset = NULL,
   verbose = FALSE,
   hessian = TRUE,
@@ -32,6 +33,10 @@ and random effects can be used as in \code{formula}.}
 \item{pass}{a vector of integers giving the pass number of the observation}
 
 \item{id}{a vector of integers identifying an observation (a set of electrofishing passes)}
+
+\item{distribution}{the distribution of the number of fish in a sample,
+\code{"poisson"} or \code{"negbin"}, the negative binomial with mean
+\eqn{\lambda_s} and size \eqn{\theta}, which is estimated}
 
 \item{offset}{an optional offset for the linear predictor of capture
 probability. An offset for log abundance is given in \code{abundance}.}
@@ -60,6 +65,7 @@ abundance}
 \item{lambda}{the expected abundance of each sample}
 \item{catch}{the total catch of each sample}
 \item{N}{the estimated realised abundance of each sample}
+\item{theta}{for the negative binomial, the estimated size parameter}
 \item{Vp_joint}{the covariance matrix of the coefficients of the models
 for capture probability and log abundance}
 If \code{fit = FALSE}, the data that would be passed to the optimiser.
@@ -87,9 +93,19 @@ probability: \code{efp2} is equivalent to this model with a separate
 structure, the total catches also contribute to the estimates of capture
 probability.
 
-The realised abundance of each sample is estimated as \eqn{T_s +
-\hat\lambda_s (1 - \hat P_s)}, the catch plus the expected number of fish
-that were not caught.
+The realised abundance of each sample is estimated as the catch plus the
+expected number of fish that were not caught, given the catch. For a
+Poisson number of fish this is \eqn{T_s + \hat\lambda_s (1 - \hat P_s)}.
+
+With \code{distribution = "negbin"} the number of fish is negative
+binomial with mean \eqn{\lambda_s} and size \eqn{\theta}, which allows for
+more variation between samples than can be explained by the model for
+abundance. The total catch is then negative binomial with mean
+\eqn{\lambda_s P_s} and the same size, and the realised abundance is
+estimated as \eqn{T_s + \hat\lambda_s (1 - \hat P_s) (\hat\theta + T_s) /
+(\hat\theta + \hat\lambda_s \hat P_s)}. As \eqn{\theta} tends to zero this
+tends to \eqn{T_s / \hat P_s}, the estimate from the conditional
+likelihood, and as \eqn{\theta} tends to infinity to the Poisson estimate.
 
 The log likelihood includes the likelihood of the total catches, so it
 cannot be compared with that of a model fitted by \code{efp2}.

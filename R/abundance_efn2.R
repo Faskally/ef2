@@ -1,11 +1,12 @@
 # Abundance for efn2 fits, called by abundance()
 #
 # The realised abundance is the catch plus the fish that were not caught,
-# N = T + M, and given the parameters M is Poisson with mean
-# lambda (1 - P). The estimate is T + M_hat, with M_hat = lambda (1 - P),
-# and the variance of M combines this Poisson variance with the
-# uncertainty in lambda and P, from the joint covariance of the
-# coefficients of the two models. Confidence intervals are computed for M
+# N = T + M. Given the parameters, M is Poisson with mean lambda (1 - P) if
+# the number of fish is Poisson, and has the mean given by expected_missed
+# if it is negative binomial. The estimate is T + M_hat, and the variance
+# of M combines its variance given the parameters with the uncertainty in
+# lambda, P and theta, from the joint covariance matrix of the parameters
+# of the two models. Confidence intervals are computed for M
 # on the log scale, so the lower limit is at least the catch.
 #
 # The expected abundance is lambda, with confidence intervals on the log
@@ -41,16 +42,32 @@ abundance_efn2 <- function(object, newdata = NULL, area = NULL, by = NULL,
 
   # derivatives with respect to the coefficients of both models, the
   # capture probability coefficients first, as in Vp_joint
+  theta <- object$theta
+  negbin <- identical(object$distribution, "negbin")
   if (target == "realised") {
-    est <- catch + lambda * (1 - P)
-    missed <- lambda * (1 - P)
-    var_process <- missed
-    # d M / d logit(P) = -lambda P (1 - P), d M / d log(lambda) = M
-    D <- cbind(cp$J * (-lambda * P * (1 - P)), Xn * missed)
+    missed <- expected_missed(catch, lambda, P, theta)
+    est <- catch + missed
+    if (!negbin) {
+      var_process <- missed
+      # d M / d logit(P) = -lambda P (1 - P), d M / d log(lambda) = M
+      D <- cbind(cp$J * (-lambda * P * (1 - P)), Xn * missed)
+    } else {
+      # M = a b / c, with a = lambda (1 - P), b = theta + T and
+      # c = theta + lambda P, and given the catch the number not caught is
+      # Poisson with a gamma mean, with variance M + a^2 b / c^2
+      a <- lambda * (1 - P)
+      b <- theta + catch
+      cc <- theta + lambda * P
+      var_process <- missed + a^2 * b / cc^2
+      dM_dlogitP <- -lambda * b * (theta + lambda) / cc^2 * P * (1 - P)
+      dM_dloglambda <- missed * theta / cc
+      dM_dlogtheta <- theta * a * (lambda * P - catch) / cc^2
+      D <- cbind(cp$J * dM_dlogitP, Xn * dM_dloglambda, dM_dlogtheta)
+    }
   } else {
     est <- lambda
     var_process <- rep(0, length(lambda))
-    D <- cbind(cp$J * 0, Xn * lambda)
+    D <- cbind(cp$J * 0, Xn * lambda, if (negbin) 0)
   }
 
   # groups of samples

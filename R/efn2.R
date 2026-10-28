@@ -21,9 +21,19 @@
 #' structure, the total catches also contribute to the estimates of capture
 #' probability.
 #'
-#' The realised abundance of each sample is estimated as \eqn{T_s +
-#' \hat\lambda_s (1 - \hat P_s)}, the catch plus the expected number of fish
-#' that were not caught.
+#' The realised abundance of each sample is estimated as the catch plus the
+#' expected number of fish that were not caught, given the catch. For a
+#' Poisson number of fish this is \eqn{T_s + \hat\lambda_s (1 - \hat P_s)}.
+#'
+#' With \code{distribution = "negbin"} the number of fish is negative
+#' binomial with mean \eqn{\lambda_s} and size \eqn{\theta}, which allows for
+#' more variation between samples than can be explained by the model for
+#' abundance. The total catch is then negative binomial with mean
+#' \eqn{\lambda_s P_s} and the same size, and the realised abundance is
+#' estimated as \eqn{T_s + \hat\lambda_s (1 - \hat P_s) (\hat\theta + T_s) /
+#' (\hat\theta + \hat\lambda_s \hat P_s)}. As \eqn{\theta} tends to zero this
+#' tends to \eqn{T_s / \hat P_s}, the estimate from the conditional
+#' likelihood, and as \eqn{\theta} tends to infinity to the Poisson estimate.
 #'
 #' The log likelihood includes the likelihood of the total catches, so it
 #' cannot be compared with that of a model fitted by \code{efp2}.
@@ -35,6 +45,9 @@
 #'   example \code{~ lifestage + s(siteID, bs = "re") + offset(log(area))}.
 #'   The variables must be the same for all passes of a sample. Smooth terms
 #'   and random effects can be used as in \code{formula}.
+#' @param distribution the distribution of the number of fish in a sample,
+#'   \code{"poisson"} or \code{"negbin"}, the negative binomial with mean
+#'   \eqn{\lambda_s} and size \eqn{\theta}, which is estimated
 #' @param offset an optional offset for the linear predictor of capture
 #'   probability. An offset for log abundance is given in \code{abundance}.
 #' @return If \code{fit = TRUE}, an object of class \code{efn2}, which
@@ -47,6 +60,7 @@
 #'   \item{lambda}{the expected abundance of each sample}
 #'   \item{catch}{the total catch of each sample}
 #'   \item{N}{the estimated realised abundance of each sample}
+#'   \item{theta}{for the negative binomial, the estimated size parameter}
 #'   \item{Vp_joint}{the covariance matrix of the coefficients of the models
 #'     for capture probability and log abundance}
 #'   If \code{fit = FALSE}, the data that would be passed to the optimiser.
@@ -71,8 +85,11 @@
 #' m1
 #' @export
 efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
+  distribution = c("poisson", "negbin"),
   offset = NULL, verbose = FALSE, hessian = TRUE,
   fit = TRUE, control = list(), sparse = TRUE) {
+
+  distribution <- match.arg(distribution)
 
   if (is.null(data)) stop("must supply data")
   if (!inherits(abundance, "formula") || length(abundance) != 2) {
@@ -111,7 +128,7 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   msn <- model_setup(nformula, sdata, sparse = sparse)
   offset_n <- msn$Gsetup$offset
   if (length(offset_n) != nrow(sdata)) offset_n <- rep(0, nrow(sdata))
-  ndat <- c(list(y = catch), model_data(msn, offset_n))
+  ndat <- c(list(y = catch, distribution = distribution), model_data(msn, offset_n))
 
   if (!fit) {
     return(list(efdat = efdat, ndat = ndat))
@@ -131,6 +148,9 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
     beta_n = beta_n,
     log_sigma_n = rep(0, length(msn$re_labels))
   )
+  if (distribution == "negbin") {
+    params$log_theta <- log(10)
+  }
   rand <- c("alpha", "alpha_n")[c(length(ms$blocks), length(msn$blocks)) > 0]
   if (!length(rand)) rand <- NULL
 
@@ -160,7 +180,11 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$P <- setNames_(out$rep$P, levels(sample_id))
   out$lambda <- setNames_(out$rep$lambda, levels(sample_id))
   out$catch <- setNames_(catch, levels(sample_id))
-  out$N <- out$catch + out$lambda * (1 - out$P)
+  out$distribution <- distribution
+  if (distribution == "negbin") {
+    out$theta <- exp(opt$par[["log_theta"]])
+  }
+  out$N <- out$catch + expected_missed(out$catch, out$lambda, out$P, out$theta)
 
   # if the model for abundance cannot describe the variation in the total
   # catches, the fit can explain it by capture probability instead, with
@@ -178,7 +202,8 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
 
   labels <- c(
     colnames(ms$X)[ms$fx_keep], ms$re_labels,
-    colnames(msn$X)[msn$fx_keep], msn$re_labels
+    colnames(msn$X)[msn$fx_keep], msn$re_labels,
+    if (distribution == "negbin") "log(theta)"
   )
   out$sdrep <- muffle_nan(
     sdreport(obj, getJointPrecision = hessian && !is.null(rand))
@@ -257,19 +282,26 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
       dimnames(out$Vb_n) <- list(names(out$coefficients_n), names(out$coefficients_n))
 
       # covariance of the coefficients of the columns of Gfit and G_n
-      keep <- c(b, which(nms == "alpha"), bn, which(nms == "alpha_n"))
-      to_gam <- Matrix::bdiag(
-        ms$to_gam[ms$gam_cols, , drop = FALSE],
-        msn$to_gam[msn$gam_cols, , drop = FALSE]
-      )
+      # for the negative binomial, log(theta) is the last row and column
+      lt <- which(nms == "log_theta")
+      keep <- c(b, which(nms == "alpha"), bn, which(nms == "alpha_n"), lt)
+      to_gam <- Matrix::bdiag(c(
+        list(
+          ms$to_gam[ms$gam_cols, , drop = FALSE],
+          msn$to_gam[msn$gam_cols, , drop = FALSE]
+        ),
+        if (length(lt)) list(Matrix::Diagonal(1))
+      ))
       Vj <- as.matrix(to_gam %*% V[keep, keep, drop = FALSE] %*% Matrix::t(to_gam))
       np <- length(ms$gam_cols)
-      jn <- c(colnames(ms$Gfit), paste0("n:", colnames(msn$G)[msn$gam_cols]))
+      nn <- length(msn$gam_cols)
+      jn <- c(colnames(ms$Gfit), paste0("n:", colnames(msn$G)[msn$gam_cols]),
+        if (length(lt)) "log_theta")
       dimnames(Vj) <- list(jn, jn)
       out$Vp_joint <- Vj
       out$Vp <- Vj[seq_len(np), seq_len(np), drop = FALSE]
       dimnames(out$Vp) <- list(colnames(ms$Gfit), colnames(ms$Gfit))
-      out$Vp_n <- Vj[-seq_len(np), -seq_len(np), drop = FALSE]
+      out$Vp_n <- Vj[np + seq_len(nn), np + seq_len(nn), drop = FALSE]
       dimnames(out$Vp_n) <- list(colnames(msn$G)[msn$gam_cols], colnames(msn$G)[msn$gam_cols])
     }
   }
@@ -277,6 +309,23 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$convergence <- opt$convergence
   class(out) <- c("efn2", "efp2", "glm", "lm")
   out
+}
+
+# the expected number of fish not caught, given the total catch. For a
+# Poisson number of fish this is lambda (1 - P), whatever the catch. For a
+# negative binomial number of fish, with size theta, the number of fish is
+# Poisson with mean lambda G, G ~ Gamma(theta, theta), and given the catch G
+# is Gamma(theta + T, theta + lambda P), so the expected number not caught
+# is lambda (1 - P) (theta + T) / (theta + lambda P). This tends to the
+# Poisson value as theta tends to infinity, and to T (1 - P) / P, so that
+# the abundance is T / P as estimated from the conditional likelihood, as
+# theta tends to zero.
+expected_missed <- function(catch, lambda, P, theta = NULL) {
+  if (is.null(theta)) {
+    lambda * (1 - P)
+  } else {
+    lambda * (1 - P) * (theta + catch) / (theta + lambda * P)
+  }
 }
 
 # names without stats::setNames
