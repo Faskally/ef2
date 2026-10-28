@@ -20,3 +20,5 @@
 - `as.gam()` is renamed
   [`as.gam2()`](https://faskally.github.io/ef2/reference/as.gam2.md) and
   `ef_data` is renamed `ef2_data`, so no names clash with ef
+- fix the choice of coefficients removed for the null space of a smooth,
+  which could give a singular penalty and NaN likelihood on macOS
