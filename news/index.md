@@ -22,3 +22,6 @@
   `ef_data` is renamed `ef2_data`, so no names clash with ef
 - fix the choice of coefficients removed for the null space of a smooth,
   which could give a singular penalty and NaN likelihood on macOS
+- when standard errors cannot be computed,
+  [`efp2()`](https://faskally.github.io/ef2/reference/efp2.md) warns
+  which parameters are affected, instead of “NaNs produced”

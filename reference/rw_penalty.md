@@ -94,7 +94,7 @@ m1
 #> 
 #> Formula:
 #> count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1))
-#> <environment: 0x558d29fade18>
+#> <environment: 0x555fd7bf88e8>
 #> 
 #> Random effects:
 #>                Estimate Std. Error
