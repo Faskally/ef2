@@ -73,23 +73,23 @@ First the effect of year: no effect, a linear trend, and first and second order 
 
 ```{r}
 m_base <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_year_linear <-
-  efp(count ~ lifestage + pass12 + year_s +
+  efp2(count ~ lifestage + pass12 + year_s +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_year_rw1 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_year_rw2 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw2_year)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
@@ -107,20 +107,20 @@ Next the effect of day of the year is added to that model, again as a linear tre
 
 ```{r}
 m_doy_linear <-
-  efp(count ~ lifestage + pass12 + doy_s +
+  efp2(count ~ lifestage + pass12 + doy_s +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_doy_rw1 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(fdoy, bs = "mrf", xt = list(penalty = rw1_doy)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_sim, pass = pass, id = sampleID)
 
 m_doy_rw2 <-
-  efp(count ~ lifestage + pass12 +
+  efp2(count ~ lifestage + pass12 +
         s(fyear, bs = "mrf", xt = list(penalty = rw1_year)) +
         s(fdoy, bs = "mrf", xt = list(penalty = rw2_doy)) +
         s(visitID, bs = "re") + s(sampleID, bs = "re"),

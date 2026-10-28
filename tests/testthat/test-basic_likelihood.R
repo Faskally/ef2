@@ -25,7 +25,7 @@ test_that("single sample, 3 pass, constant p", {
 
   # the data
   efdat <-
-    efp(
+    efp2(
       formula,
       data = data,
       fit = FALSE
@@ -67,15 +67,15 @@ test_that("simple model fits", {
   ef_data$visitID <- as.numeric(factor(paste(ef_data$date, ef_data$siteID)))
 
 
-  m1 <- efp(count ~ 1,
+  m1 <- efp2(count ~ 1,
     data = ef_data, pass = pass, id = sampleID
   )
 
-  m2 <- efp(count ~ lifestage + pass12,
+  m2 <- efp2(count ~ lifestage + pass12,
     data = ef_data, pass = pass, id = sampleID
   )
 
-  m3 <- efp(count ~ lifestage + pass + year,
+  m3 <- efp2(count ~ lifestage + pass + year,
     data = ef_data, pass = pass, id = sampleID
   )
 
@@ -103,7 +103,7 @@ test_that("random effects likelihood", {
   ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
 
   efdat <-
-    efp(
+    efp2(
       count ~ lifestage + s(visitID, bs = "re") + s(sampleID, bs = "re"),
       data = ef_data, pass = pass, id = sampleID,
       fit = FALSE
@@ -146,15 +146,15 @@ test_that("visit and sample random effects fit", {
     ))
   ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
 
-  m0 <- efp(count ~ lifestage,
+  m0 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID
   )
 
-  m1 <- efp(count ~ lifestage + s(visitID, bs = "re"),
+  m1 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
     data = ef_data, pass = pass, id = sampleID
   )
 
-  m2 <- efp(count ~ lifestage + s(visitID, bs = "re") + s(sampleID, bs = "re"),
+  m2 <- efp2(count ~ lifestage + s(visitID, bs = "re") + s(sampleID, bs = "re"),
     data = ef_data, pass = pass, id = sampleID
   )
 
@@ -205,10 +205,10 @@ test_that("gam conversion", {
     ))
   ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
 
-  m1 <- efp(count ~ lifestage,
+  m1 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID
   )
-  m2 <- efp(count ~ lifestage + s(visitID, bs = "re"),
+  m2 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
     data = ef_data, pass = pass, id = sampleID
   )
 
@@ -234,10 +234,10 @@ test_that("prediction", {
     ))
   ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
 
-  m1 <- efp(count ~ lifestage,
+  m1 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID
   )
-  m2 <- efp(count ~ lifestage + s(visitID, bs = "re"),
+  m2 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
     data = ef_data, pass = pass, id = sampleID
   )
 
@@ -274,13 +274,13 @@ test_that("prediction", {
   )
 
   # offsets are included in predictions for the fitted data
-  m3 <- efp(count ~ lifestage,
+  m3 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID,
     offset = rep(0.1, nrow(ef_data))
   )
   expect_equal(as.vector(predict(m3, type = "response")), fitted(m3))
 
-  m4 <- efp(count ~ lifestage,
+  m4 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID, hessian = FALSE
   )
   expect_error(predict(m4, se.fit = TRUE), "hessian = TRUE")
@@ -288,7 +288,7 @@ test_that("prediction", {
 
 test_that("pass probabilities", {
   data <- data.frame(n = c(100, 50, 25), pass = 1:3, id = 1)
-  m <- efp(n ~ 1, data = data)
+  m <- efp2(n ~ 1, data = data)
   p <- fitted(m)
   expect_equal(fitted(m, type = "pi"), p * c(1, 1 - p[1], (1 - p[1]) * (1 - p[2])))
   expect_equal(fitted(m, type = "both"), list(p = p, pi = fitted(m, type = "pi")))
@@ -301,10 +301,10 @@ test_that("unpenalised smooth terms", {
       ef_data$date, ef_data$siteID,
       ef_data$lifestage, ef_data$species
     ))
-  m0 <- efp(count ~ lifestage,
+  m0 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID
   )
-  m1 <- efp(count ~ lifestage + s(doy, k = 3, fx = TRUE),
+  m1 <- efp2(count ~ lifestage + s(doy, k = 3, fx = TRUE),
     data = ef_data, pass = pass, id = sampleID
   )
 
@@ -342,10 +342,10 @@ test_that("methods", {
     ))
   ef_data$visitID <- factor(paste(ef_data$date, ef_data$siteID))
 
-  m1 <- efp(count ~ lifestage,
+  m1 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID
   )
-  m2 <- efp(count ~ lifestage + s(visitID, bs = "re"),
+  m2 <- efp2(count ~ lifestage + s(visitID, bs = "re"),
     data = ef_data, pass = pass, id = sampleID
   )
 
@@ -384,7 +384,7 @@ test_that("methods", {
   expect_error(anova(m1), "not available")
   expect_error(plot(m1), "not available")
 
-  m3 <- efp(count ~ lifestage,
+  m3 <- efp2(count ~ lifestage,
     data = ef_data, pass = pass, id = sampleID, hessian = FALSE
   )
   expect_error(vcov(m3), "hessian = TRUE")

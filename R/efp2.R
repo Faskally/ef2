@@ -19,14 +19,14 @@
 #'   sparse bases and penalties stay sparse, see Details. If FALSE the
 #'   constrained basis and penalties from \code{mgcv} are used, which are
 #'   dense and so slower to fit.
-#' @return If \code{fit = TRUE}, an object of class \code{efp}, a list which
+#' @return If \code{fit = TRUE}, an object of class \code{efp2}, a list which
 #'   inherits from \code{glm}, containing among other things the fixed effect
 #'   estimates (\code{coefficients}), the random effect estimates
 #'   (\code{random}), the standard deviations of the random effects and
 #'   smooths (\code{sigma}),
 #'   the fitted capture probabilities (\code{fitted}), the log likelihood
 #'   (\code{llik}) and the variance matrix of the fixed effects (\code{Vb}).
-#'   See \code{\link{efp-methods}} for the methods available. If
+#'   See \code{\link{efp2-methods}} for the methods available. If
 #'   \code{fit = FALSE}, a list containing the data that would be passed to
 #'   the optimiser.
 #'
@@ -117,11 +117,11 @@
 #'                                     3,  3,  3,  3,  4,  4,  4, 4, 6))
 #'
 #' # Fit a simple model
-#' m2 <- efp(n ~ 1 + factor(stage), data = ef_data, pass = pass, id = sample)
+#' m2 <- efp2(n ~ 1 + factor(stage), data = ef_data, pass = pass, id = sample)
 #' cbind(ef_data, fit = fitted(m2))
-#' m3 <- efp(n ~ 1 + factor(stage), data = ef_data2, pass = pass, id = sample)
+#' m3 <- efp2(n ~ 1 + factor(stage), data = ef_data2, pass = pass, id = sample)
 #' cbind(ef_data2, fit = fitted(m3))
-#' m4 <- efp(n ~ 1 + factor(stage), data = ef_data3, pass = pass, id = sample)
+#' m4 <- efp2(n ~ 1 + factor(stage), data = ef_data3, pass = pass, id = sample)
 #' cbind(ef_data3, fit = fitted(m4))
 #'
 #' # create two electrofishing site visits with 3 and 4 passes and 2 lifestages
@@ -134,7 +134,7 @@
 #'                       sample = c(  1,  1,  1,  2,  2,  2,
 #'                                    3,  3,  3,  4,  4,  4))
 #' # Fit a simple model
-#' m2 <- efp(n ~ 1 + factor(stage) + factor(replace(pass, pass> 2, 2)),
+#' m2 <- efp2(n ~ 1 + factor(stage) + factor(replace(pass, pass> 2, 2)),
 #'           data = ef_data, pass = pass, id = sample)
 #' out <- cbind(ef_data, p = fitted(m2, type = "p"))
 #' out
@@ -148,7 +148,7 @@
 #' days <- min(ef_data$doy):max(ef_data$doy)
 #' ef_data$fdoy <- factor(ef_data$doy, levels = days)
 #' rw2 <- rw_penalty(days, order = 2)
-#' m5 <- efp(count ~ siteID + pass12 + lifestage +
+#' m5 <- efp2(count ~ siteID + pass12 + lifestage +
 #'             s(fdoy, bs = "mrf", xt = list(penalty = rw2)),
 #'           data = ef_data, pass = pass, id = sampleID)
 #' m5
@@ -160,7 +160,7 @@
 #' cbind(newdata, fit = pred$fit, se = pred$se.fit)
 #'
 #' # an unpenalised regression spline
-#' m6 <- efp(count ~ siteID + pass12 + lifestage + s(doy, k = 3, fx = TRUE),
+#' m6 <- efp2(count ~ siteID + pass12 + lifestage + s(doy, k = 3, fx = TRUE),
 #'           data = ef_data, pass = pass, id = sampleID)
 #' m6
 #'
@@ -174,7 +174,7 @@
 #' @importFrom stats ave
 #'
 #' @export
-efp <- function(formula, data = NULL, pass = pass, id = id,
+efp2 <- function(formula, data = NULL, pass = pass, id = id,
   offset = NULL, verbose = FALSE, hessian = TRUE,
   fit = TRUE, control = list(), sparse = TRUE) {
 

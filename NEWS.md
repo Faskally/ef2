@@ -6,6 +6,7 @@
   falsely converged on some platforms; `control` is passed to `nlminb()`
 * the likelihood is computed on the log scale, so it stays finite when
   capture probabilities are close to 0 or 1
+* `efp()` is renamed `efp2()`, so ef and ef2 can be attached together
 
 # ef 2.0.0 (2026-10-09)
 

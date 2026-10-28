@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict.efp2.R
 \name{predict.efp2}
 \alias{predict.efp2}
-\title{Predict capture probabilities from an efp fit}
+\title{Predict capture probabilities from an efp2 fit}
 \usage{
 \method{predict}{efp2}(
   object,
@@ -14,7 +14,7 @@
 )
 }
 \arguments{
-\item{object}{an efp fitted model}
+\item{object}{an efp2 fitted model}
 
 \item{newdata}{a data.frame containing the covariates in the model
 formula. If NULL, predictions are for the data used to fit the model.}
@@ -40,7 +40,7 @@ elements \code{fit} and \code{se.fit}. If \code{type = "lpmatrix"} a
 matrix.
 }
 \description{
-Predictions of capture probability from a fitted \code{efp} model, for
+Predictions of capture probability from a fitted \code{efp2} model, for
 the data used to fit the model or for new data.
 }
 \details{
@@ -50,14 +50,14 @@ be made for any level in the penalty, including levels with no data, which
 are interpolated. Standard errors on the response scale are
 calculated using the delta method.
 
-The \code{offset} supplied to \code{\link{efp}} is included in the
+The \code{offset} supplied to \code{\link{efp2}} is included in the
 predictions only when \code{newdata} is NULL.
 }
 \examples{
 data(ef_data)
 ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
                                  ef_data$lifestage, ef_data$species))
-m1 <- efp(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
+m1 <- efp2(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
 
 newdata <- data.frame(lifestage = c("Fry", "Parr"))
 predict(m1, newdata = newdata, type = "response", se.fit = TRUE)

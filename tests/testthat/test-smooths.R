@@ -46,7 +46,7 @@ test_that("random walk likelihood", {
   for (order in 1:2) {
     rw <- rw_penalty(1:12, order = order)
     efdat <-
-      efp(
+      efp2(
         n ~ s(fyear, bs = "mrf", xt = list(penalty = rw)),
         data = data, pass = pass, id = visit, fit = FALSE
       )
@@ -96,11 +96,11 @@ test_that("random walk smooths fit", {
   rw1 <- rw_penalty(1:12)
   rw2 <- rw_penalty(1:12, order = 2)
 
-  m0 <- efp(n ~ 1, data = data, pass = pass, id = visit)
-  m1 <- efp(n ~ s(fyear, bs = "mrf", xt = list(penalty = rw1)),
+  m0 <- efp2(n ~ 1, data = data, pass = pass, id = visit)
+  m1 <- efp2(n ~ s(fyear, bs = "mrf", xt = list(penalty = rw1)),
     data = data, pass = pass, id = visit
   )
-  m2 <- efp(n ~ s(fyear, bs = "mrf", xt = list(penalty = rw2)),
+  m2 <- efp2(n ~ s(fyear, bs = "mrf", xt = list(penalty = rw2)),
     data = data, pass = pass, id = visit
   )
 
@@ -149,7 +149,7 @@ test_that("random walk smooths with levels in any order", {
   rw1 <- rw_penalty(6:17)
 
   efdat <-
-    efp(
+    efp2(
       n ~ s(fyear, bs = "mrf", xt = list(penalty = rw1)),
       data = data, pass = pass, id = visit, fit = FALSE
     )
@@ -160,7 +160,7 @@ test_that("random walk smooths with levels in any order", {
     check.attributes = FALSE
   )
 
-  m1 <- efp(n ~ s(fyear, bs = "mrf", xt = list(penalty = rw1)),
+  m1 <- efp2(n ~ s(fyear, bs = "mrf", xt = list(penalty = rw1)),
     data = data, pass = pass, id = visit
   )
   expect_equal(m1$convergence, 0)
@@ -182,8 +182,8 @@ test_that("other penalised smooths fit", {
   data$x <- rep(runif(nlevels(data$visit)), each = 3)
 
   # thin plate spline, sparse and dense set up
-  m1 <- efp(n ~ s(year, k = 6), data = data, pass = pass, id = visit)
-  m1_dense <- efp(n ~ s(year, k = 6),
+  m1 <- efp2(n ~ s(year, k = 6), data = data, pass = pass, id = visit)
+  m1_dense <- efp2(n ~ s(year, k = 6),
     data = data, pass = pass, id = visit, sparse = FALSE
   )
   expect_equal(m1$convergence, 0)
@@ -199,20 +199,20 @@ test_that("other penalised smooths fit", {
   expect_equal(unname(m1$sigma), unname(m1_dense$sigma), tolerance = 0.1)
 
   # tensor product smooth, which has two penalties
-  m2 <- efp(n ~ te(year, x, k = 3), data = data, pass = pass, id = visit)
+  m2 <- efp2(n ~ te(year, x, k = 3), data = data, pass = pass, id = visit)
   expect_equal(m2$convergence, 0)
   expect_equal(names(m2$sigma), c("te(year,x)1", "te(year,x)2"))
   expect_equal(as.vector(predict(m2, newdata = data, type = "response")), fitted(m2))
 
   # smooths and random effects together
-  m3 <- efp(n ~ s(year, bs = "cr", k = 6) + s(site, bs = "re"),
+  m3 <- efp2(n ~ s(year, bs = "cr", k = 6) + s(site, bs = "re"),
     data = data, pass = pass, id = visit
   )
   expect_equal(names(m3$sigma), c("s(year)", "s(site)"))
   expect_equal(as.vector(predict(m3, newdata = data, type = "response")), fitted(m3))
 
   # by variable smooths use the mgcv constrained basis
-  m4 <- efp(n ~ site + s(year, by = site, k = 4),
+  m4 <- efp2(n ~ site + s(year, by = site, k = 4),
     data = data, pass = pass, id = visit
   )
   expect_equal(length(m4$sigma), nlevels(data$site))

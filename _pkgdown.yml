@@ -8,12 +8,12 @@ reference:
 - title: Fitting models
   desc: Estimate capture probability from multipass electrofishing data.
   contents:
-  - efp
+  - efp2
   - rw_penalty
 - title: Predictions and summaries
   contents:
   - predict.efp2
-  - efp-methods
+  - efp2-methods
   - as.gam
 - title: Utilities
   contents:
@@ -30,7 +30,7 @@ reference:
 articles:
 - title: Worked examples
   desc: >
-    Worked examples of efp() using simulated data, so that the estimates
+    Worked examples of efp2() using simulated data, so that the estimates
     can be compared with the truth.
   navbar: Worked examples
   contents:

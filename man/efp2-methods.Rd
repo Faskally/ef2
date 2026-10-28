@@ -3,7 +3,7 @@
 %   R/model.matrix.efp2.R, R/print.efp2.R
 \name{fitted.efp2}
 \alias{fitted.efp2}
-\alias{efp-methods}
+\alias{efp2-methods}
 \alias{vcov.efp2}
 \alias{confint.efp2}
 \alias{logLik.efp2}
@@ -15,7 +15,7 @@
 \alias{plot.efp2}
 \alias{model.matrix.efp2}
 \alias{print.efp2}
-\title{Methods for efp fits}
+\title{Methods for efp2 fits}
 \usage{
 \method{fitted}{efp2}(object, type = "p", ...)
 
@@ -42,7 +42,7 @@
 \method{print}{efp2}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
 \arguments{
-\item{object, x}{an efp fitted model}
+\item{object, x}{an efp2 fitted model}
 
 \item{type}{the type of fitted value: \code{"p"} for the capture
 probability in each pass, \code{"pi"} for the probability that a fish
@@ -71,7 +71,7 @@ argument invisibly.
 }
 \description{
 Methods to summarise and extract information from a model fitted
-using \code{\link{efp}}.
+using \code{\link{efp2}}.
 }
 \details{
 The variance matrix returned by \code{vcov} is for the fixed effects
@@ -84,13 +84,13 @@ contains random effects or penalised smooths, and the degrees of freedom
 are the number of fixed effects plus the number of standard deviations.
 
 Residuals, analysis of deviance tables and diagnostic plots are not
-available for efp fits, and the corresponding methods return an error.
+available for efp2 fits, and the corresponding methods return an error.
 }
 \examples{
 data(ef_data)
 ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
                                  ef_data$lifestage, ef_data$species))
-m1 <- efp(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
+m1 <- efp2(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
 
 summary(m1)
 vcov(m1)

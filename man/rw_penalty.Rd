@@ -22,7 +22,7 @@ which is a basis for the functions which are not penalised.
 Creates a first or second order random walk penalty matrix for the levels
 of an ordered covariate, for use with the Markov random field (mrf) basis
 of \code{mgcv}. This is the recommended way to include smooth terms in
-\code{\link{efp}}: the basis and the penalty are both sparse, so models
+\code{\link{efp2}}: the basis and the penalty are both sparse, so models
 are quick to fit even when there are many levels.
 }
 \details{
@@ -30,7 +30,7 @@ A first order random walk (\code{order = 1}) penalises the differences
 between neighbouring levels, and shrinks towards a constant. A second
 order random walk (\code{order = 2}) penalises the second differences, and
 shrinks towards a linear trend. In both cases the standard deviation
-estimated by \code{\link{efp}} is the standard deviation of the steps
+estimated by \code{\link{efp2}} is the standard deviation of the steps
 of the random walk, on the logit scale.
 
 To use the penalty, the covariate must be a factor with the same levels
@@ -48,7 +48,7 @@ days <- min(ef_data$doy):max(ef_data$doy)
 ef_data$fdoy <- factor(ef_data$doy, levels = days)
 rw1 <- rw_penalty(days)
 
-m1 <- efp(count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)),
+m1 <- efp2(count ~ lifestage + s(fdoy, bs = "mrf", xt = list(penalty = rw1)),
           data = ef_data, pass = pass, id = sampleID)
 m1
 

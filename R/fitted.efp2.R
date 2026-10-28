@@ -1,4 +1,4 @@
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @export
 fitted.efp2 <- function(object, type = "p", ...) {
   type <- match.arg(type, c("p", "pi", "both", "lpmatrix"))

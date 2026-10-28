@@ -8,7 +8,7 @@
 \description{
 A set of functions to estimate capture probabilities and densities
 from multipass removal (electrofishing) data. The main function is
-\code{\link{efp}}, which fits a model for capture probability, and
+\code{\link{efp2}}, which fits a model for capture probability, and
 predictions of capture probability are available from
 \code{\link{predict.efp2}}.
 }

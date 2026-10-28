@@ -1,9 +1,9 @@
-#' Predict capture probabilities from an efp fit
+#' Predict capture probabilities from an efp2 fit
 #'
-#' Predictions of capture probability from a fitted \code{efp} model, for
+#' Predictions of capture probability from a fitted \code{efp2} model, for
 #' the data used to fit the model or for new data.
 #'
-#' @param object an efp fitted model
+#' @param object an efp2 fitted model
 #' @param newdata a data.frame containing the covariates in the model
 #'   formula. If NULL, predictions are for the data used to fit the model.
 #' @param type the type of prediction: \code{"link"} for the logit capture
@@ -28,14 +28,14 @@
 #' are interpolated. Standard errors on the response scale are
 #' calculated using the delta method.
 #'
-#' The \code{offset} supplied to \code{\link{efp}} is included in the
+#' The \code{offset} supplied to \code{\link{efp2}} is included in the
 #' predictions only when \code{newdata} is NULL.
 #'
 #' @examples
 #' data(ef_data)
 #' ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
 #'                                  ef_data$lifestage, ef_data$species))
-#' m1 <- efp(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
+#' m1 <- efp2(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
 #'
 #' newdata <- data.frame(lifestage = c("Fry", "Parr"))
 #' predict(m1, newdata = newdata, type = "response", se.fit = TRUE)

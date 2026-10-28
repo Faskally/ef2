@@ -97,7 +97,7 @@ further details.
 
 ``` r
 m1 <-
-  efp(
+  efp2(
     count ~ siteID + fyear + pass12 + lifestage,
     data = ef_data, pass = pass, id = sampleID
   )
@@ -105,7 +105,7 @@ m1 <-
 
     ## 
     ## Call:
-    ## efp(formula = count ~ siteID + fyear + pass12 + lifestage, data = ef_data, 
+    ## efp2(formula = count ~ siteID + fyear + pass12 + lifestage, data = ef_data, 
     ##     pass = pass, id = sampleID)
     ## 
     ## Formula:
@@ -153,7 +153,7 @@ over years.
 rw1 <- rw_penalty(levels(ef_data$fyear), order = 1)
 
 m1_smooth <-
-  efp(
+  efp2(
     count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) +
       pass12 + lifestage,
     data = ef_data, pass = pass, id = sampleID
@@ -162,7 +162,7 @@ m1_smooth <-
 
     ## 
     ## Call:
-    ## efp(formula = count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
+    ## efp2(formula = count ~ siteID + s(fyear, bs = "mrf", xt = list(penalty = rw1)) + 
     ##     pass12 + lifestage, data = ef_data, pass = pass, id = sampleID)
     ## 
     ## Formula:
@@ -231,7 +231,7 @@ ef_data$fdoy <- factor(ef_data$doy, levels = days)
 rw2 <- rw_penalty(days, order = 2)
 
 m1_doy <-
-  efp(
+  efp2(
     count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) +
       pass12 + lifestage,
     data = ef_data, pass = pass, id = sampleID
@@ -240,7 +240,7 @@ m1_doy <-
 
     ## 
     ## Call:
-    ## efp(formula = count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
+    ## efp2(formula = count ~ siteID + s(fdoy, bs = "mrf", xt = list(penalty = rw2)) + 
     ##     pass12 + lifestage, data = ef_data, pass = pass, id = sampleID)
     ## 
     ## Formula:
@@ -388,7 +388,7 @@ ef_data$fsampleID <- factor(ef_data$sampleID)
 Fit a model with visit and sample random effects
 
 ``` r
-mfull <- efp(count ~ siteID + year + lifestage + pass12 +
+mfull <- efp2(count ~ siteID + year + lifestage + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
              data = ef_data, pass = pass, id = sampleID)
 
@@ -397,7 +397,7 @@ mfull
 
     ## 
     ## Call:
-    ## efp(formula = count ~ siteID + year + lifestage + pass12 + s(visitID, 
+    ## efp2(formula = count ~ siteID + year + lifestage + pass12 + s(visitID, 
     ##     bs = "re") + s(fsampleID, bs = "re"), data = ef_data, pass = pass, 
     ##     id = sampleID)
     ## 
@@ -449,7 +449,7 @@ AIC(mfull)
 - Model without lifestage
 
 ``` r
-mlife <- efp(count ~ siteID + year + pass12 +
+mlife <- efp2(count ~ siteID + year + pass12 +
                s(visitID, bs = "re") + s(fsampleID, bs = "re"),
              data = ef_data, pass = pass, id = sampleID)
 

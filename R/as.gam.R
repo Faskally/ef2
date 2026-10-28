@@ -1,8 +1,8 @@
-#' Conversion of an efp fit to a gam fit for plotting
+#' Conversion of an efp2 fit to a gam fit for plotting
 #'
-#' Converts an efp fit to a gam object, so that the plotting and prediction
+#' Converts an efp2 fit to a gam object, so that the plotting and prediction
 #' tools in the \code{mgcv} package can be used. The coefficients and their
-#' variances are those estimated by \code{efp}, but the smoothing parameters
+#' variances are those estimated by \code{efp2}, but the smoothing parameters
 #' and effective degrees of freedom in the gam object are not.
 #'
 #' The conversion fits a model using \code{mgcv}, which can take a very
@@ -10,14 +10,14 @@
 #' the conversion, see \code{\link{predict.efp2}}.
 #'
 #'
-#' @param object an efp fitted model
+#' @param object an efp2 fitted model
 #' @return an object of class \code{gam}, see \code{\link[mgcv]{gamObject}}
 #'
 #' @examples
 #' data(ef_data)
 #' ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
 #'                                  ef_data$lifestage, ef_data$species))
-#' m1 <- efp(count ~ lifestage + s(doy, k = 3),
+#' m1 <- efp2(count ~ lifestage + s(doy, k = 3),
 #'           data = ef_data, pass = pass, id = sampleID)
 #'
 #' m1_gam <- as.gam(m1)
@@ -42,11 +42,11 @@ as.gam <- function(object) {
     )
   }
 
-  message("Note that, although predictions and plots will be correct\n the smoothing parameters and degrees of freedom in the gam object are not those estimated by efp!")
+  message("Note that, although predictions and plots will be correct\n the smoothing parameters and degrees of freedom in the gam object are not those estimated by efp2!")
   g1
 }
 
-# gam container holding the efp estimates, used for prediction and plotting
+# gam container holding the efp2 estimates, used for prediction and plotting
 efp_gam <- function(object) {
   # make a gam container from the original setup. The smoothing parameters
   # are fixed so that this is quick: the gam fit itself is not used.

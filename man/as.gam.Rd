@@ -2,20 +2,20 @@
 % Please edit documentation in R/as.gam.R
 \name{as.gam}
 \alias{as.gam}
-\title{Conversion of an efp fit to a gam fit for plotting}
+\title{Conversion of an efp2 fit to a gam fit for plotting}
 \usage{
 as.gam(object)
 }
 \arguments{
-\item{object}{an efp fitted model}
+\item{object}{an efp2 fitted model}
 }
 \value{
 an object of class \code{gam}, see \code{\link[mgcv]{gamObject}}
 }
 \description{
-Converts an efp fit to a gam object, so that the plotting and prediction
+Converts an efp2 fit to a gam object, so that the plotting and prediction
 tools in the \code{mgcv} package can be used. The coefficients and their
-variances are those estimated by \code{efp}, but the smoothing parameters
+variances are those estimated by \code{efp2}, but the smoothing parameters
 and effective degrees of freedom in the gam object are not.
 }
 \details{
@@ -27,7 +27,7 @@ the conversion, see \code{\link{predict.efp2}}.
 data(ef_data)
 ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
                                  ef_data$lifestage, ef_data$species))
-m1 <- efp(count ~ lifestage + s(doy, k = 3),
+m1 <- efp2(count ~ lifestage + s(doy, k = 3),
           data = ef_data, pass = pass, id = sampleID)
 
 m1_gam <- as.gam(m1)

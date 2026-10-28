@@ -1,9 +1,9 @@
-#' Methods for efp fits
+#' Methods for efp2 fits
 #'
 #' Methods to summarise and extract information from a model fitted
-#' using \code{\link{efp}}.
+#' using \code{\link{efp2}}.
 #'
-#' @param object,x an efp fitted model
+#' @param object,x an efp2 fitted model
 #' @param type the type of fitted value: \code{"p"} for the capture
 #'   probability in each pass, \code{"pi"} for the probability that a fish
 #'   is first caught in each pass, \code{"both"} for a list containing both
@@ -25,7 +25,7 @@
 #' are the number of fixed effects plus the number of standard deviations.
 #'
 #' Residuals, analysis of deviance tables and diagnostic plots are not
-#' available for efp fits, and the corresponding methods return an error.
+#' available for efp2 fits, and the corresponding methods return an error.
 #'
 #' @return \code{fitted} returns a vector, list or matrix depending on
 #'   \code{type}; \code{model.matrix} a matrix; \code{vcov} a matrix;
@@ -41,7 +41,7 @@
 #' data(ef_data)
 #' ef_data$sampleID <- factor(paste(ef_data$date, ef_data$siteID,
 #'                                  ef_data$lifestage, ef_data$species))
-#' m1 <- efp(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
+#' m1 <- efp2(count ~ lifestage, data = ef_data, pass = pass, id = sampleID)
 #'
 #' summary(m1)
 #' vcov(m1)
@@ -49,10 +49,10 @@
 #' logLik(m1)
 #' head(fitted(m1))
 #'
-#' @name efp-methods
+#' @name efp2-methods
 NULL
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @export
 vcov.efp2 <- function(object, ...) {
   if (!is.matrix(object$Vb)) {
@@ -61,14 +61,14 @@ vcov.efp2 <- function(object, ...) {
   object$Vb
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @importFrom stats confint.default logLik
 #' @export
 confint.efp2 <- function(object, parm, level = 0.95, ...) {
   confint.default(object, parm, level = level, ...)
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @export
 logLik.efp2 <- function(object, ...) {
   structure(
@@ -77,13 +77,13 @@ logLik.efp2 <- function(object, ...) {
   )
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @export
 formula.efp2 <- function(x, ...) {
   x$formula
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @method summary efp2
 #' @exportS3Method summary efp2
 summary.efp2 <- function(object, ...) {
@@ -106,7 +106,7 @@ summary.efp2 <- function(object, ...) {
   out
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @method print summary.efp2
 #' @exportS3Method print summary.efp2
 print.summary.efp2 <- function(x, digits = max(3L, getOption("digits") - 3L),  ...) {
@@ -148,20 +148,20 @@ print.summary.efp2 <- function(x, digits = max(3L, getOption("digits") - 3L),  .
   invisible(x)
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @export
 residuals.efp2 <- function(object, ...) {
-  stop("residuals are not available for efp fits")
+  stop("residuals are not available for efp2 fits")
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @export
 anova.efp2 <- function(object, ...) {
-  stop("anova is not available for efp fits, models can be compared using AIC")
+  stop("anova is not available for efp2 fits, models can be compared using AIC")
 }
 
-#' @rdname efp-methods
+#' @rdname efp2-methods
 #' @export
 plot.efp2 <- function(x, ...) {
-  stop("plot is not available for efp fits, see as.gam for plotting model terms")
+  stop("plot is not available for efp2 fits, see as.gam for plotting model terms")
 }
