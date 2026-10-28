@@ -27,7 +27,8 @@ ef_nll <- function(params, efdat) {
     eta <- eta + drop(efdat$Z %*% alpha)
   }
 
-  p <- 1 / (1 + exp(-eta))
+  # RTMB's plogis, as stats::plogis does not work with AD types
+  p <- RTMB::plogis(eta)
   idx <- split(seq_along(efdat$y), efdat$sample_id)
   ps <- unname(lapply(idx, function(i) p[i]))
   etas <- unname(lapply(idx, function(i) eta[i]))
