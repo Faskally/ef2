@@ -16,30 +16,20 @@ ll_sample <- function(eta, y) {
   list(ll = sum(y * log_pi) - sum(y) * log_P, log_P = log_P)
 }
 
-# negative log likelihood, the RTMB objective function
-ef_nll <- function(params, efdat) {
-  alpha <- params$alpha
-  beta <- params$beta
-  log_sigma <- params$log_sigma
-
-  eta <- drop(efdat$X %*% beta) + efdat$offset
+# linear predictor of a model set up by model_setup
+linear_predictor <- function(dat, beta, alpha) {
+  eta <- drop(dat$X %*% beta) + dat$offset
   if (length(alpha)) {
     # add random effects
-    eta <- eta + drop(efdat$Z %*% alpha)
+    eta <- eta + drop(dat$Z %*% alpha)
   }
+  eta
+}
 
-  p <- plogis(eta)
-  idx <- split(seq_along(efdat$y), efdat$sample_id)
-  ps <- unname(lapply(idx, function(i) p[i]))
-  etas <- unname(lapply(idx, function(i) eta[i]))
-  ys <- lapply(idx, function(i) efdat$y[i])
-
-  nll <- 0 # negative log likelihood
-
-  sigma <- exp(log_sigma)
-
-  # add random effects and penalised smooths
-  for (block in efdat$blocks) {
+# negative log density of the random effects and penalised smooths
+re_nll <- function(alpha, sigma, blocks) {
+  nll <- 0
+  for (block in blocks) {
     u <- alpha[block$idx]
     if (is.null(block$S)) {
       # independent random effects
@@ -54,6 +44,25 @@ ef_nll <- function(params, efdat) {
       nll <- nll - dgmrf(u, 0, Q, log = TRUE)
     }
   }
+  nll
+}
+
+# negative log likelihood of the catches conditional on the total catch of
+# each sample, including the random effects for capture probability
+#   returns the negative log likelihood, the log cumulative capture
+#   probability and the capture probabilities of each sample, and the
+#   standard deviations of the random effects
+capture_nll <- function(alpha, beta, log_sigma, efdat) {
+  eta <- linear_predictor(efdat, beta, alpha)
+
+  p <- plogis(eta)
+  idx <- split(seq_along(efdat$y), efdat$sample_id)
+  ps <- unname(lapply(idx, function(i) p[i]))
+  etas <- unname(lapply(idx, function(i) eta[i]))
+  ys <- lapply(idx, function(i) efdat$y[i])
+
+  sigma <- exp(log_sigma)
+  nll <- re_nll(alpha, sigma, efdat$blocks)
 
   log_P <- vector("list", length(idx))
   for (i in seq_along(idx)) {
@@ -62,16 +71,64 @@ ef_nll <- function(params, efdat) {
     log_P[[i]] <- ll$log_P
   }
 
+  list(nll = nll, log_P = do.call(c, log_P), ps = ps, sigma = sigma)
+}
+
+# negative log likelihood, the RTMB objective function
+ef_nll <- function(params, efdat) {
+  cap <- capture_nll(params$alpha, params$beta, params$log_sigma, efdat)
+
   # cumulative capture probability of each sample
-  P <- exp(do.call(c, log_P))
+  P <- exp(cap$log_P)
   REPORT(P)
 
   # delta method for sigma
+  sigma <- cap$sigma
   if (length(sigma)) {
     ADREPORT(sigma)
   }
   REPORT(sigma)
 
+  ps <- cap$ps
+  REPORT(ps)
+
+  cap$nll
+}
+
+# joint negative log likelihood of the catches and the number of fish, the
+# RTMB objective function for efn2. The number of fish in sample s is
+# Poisson with mean lambda_s, so the total catch is Poisson with mean
+# lambda_s P_s, and the catches given the total catch are multinomial as in
+# ef_nll. The likelihood is the product of the two.
+#   ndat: the model for log(lambda), with one row per sample, in the order
+#     of the levels of efdat$sample_id, and y the total catch of each sample
+ef_nll_joint <- function(params, efdat, ndat) {
+  cap <- capture_nll(params$alpha, params$beta, params$log_sigma, efdat)
+
+  log_lambda <- linear_predictor(ndat, params$beta_n, params$alpha_n)
+  sigma_n <- exp(params$log_sigma_n)
+  nll <- cap$nll + re_nll(params$alpha_n, sigma_n, ndat$blocks)
+
+  # Poisson total catch, with mean lambda P
+  log_mu <- log_lambda + cap$log_P
+  nll <- nll - sum(ndat$y * log_mu - exp(log_mu) - lgamma(ndat$y + 1))
+
+  P <- exp(cap$log_P)
+  lambda <- exp(log_lambda)
+  REPORT(P)
+  REPORT(lambda)
+
+  sigma <- cap$sigma
+  if (length(sigma)) {
+    ADREPORT(sigma)
+  }
+  if (length(sigma_n)) {
+    ADREPORT(sigma_n)
+  }
+  REPORT(sigma)
+  REPORT(sigma_n)
+
+  ps <- cap$ps
   REPORT(ps)
 
   nll

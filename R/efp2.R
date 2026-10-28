@@ -218,16 +218,12 @@ efp2 <- function(formula, data = NULL, pass = pass, id = id,
   # get data for likelihood
   ord_output <- order(id, pass)
 
-  efdat <-
-    list(
-      y = Gsetup$y,
-      offset = offset,
-      sample_id = factor(id),
-      X = as(as(X[, fx_keep, drop = FALSE], "generalMatrix"), "TsparseMatrix"),
-      Z = as(as(Z, "generalMatrix"), "TsparseMatrix"),
-      re_id = as.integer(unlist(lapply(blocks, function(x) rep(x$sig[1], length(x$idx))))),
-      blocks = lapply(blocks, function(x) x[c("idx", "sig", "S")])
-    )
+  efdat <- c(
+    list(y = Gsetup$y, sample_id = factor(id)),
+    model_data(ms, offset)
+  )
+  # the standard deviation of each random effect
+  efdat$re_id <- as.integer(unlist(lapply(blocks, function(x) rep(x$sig[1], length(x$idx)))))
 
   if (!fit) {
     return(efdat)

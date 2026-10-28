@@ -88,3 +88,14 @@ model_setup <- function(formula, data, sparse = TRUE) {
     fx_keep = fx_keep, to_gam = to_gam, gam_cols = gam_cols, Gfit = Gfit
   )
 }
+
+# the parts of a model set up by model_setup that are needed by the
+# likelihood
+model_data <- function(ms, offset) {
+  list(
+    offset = offset,
+    X = as(as(ms$X[, ms$fx_keep, drop = FALSE], "generalMatrix"), "TsparseMatrix"),
+    Z = as(as(ms$Z, "generalMatrix"), "TsparseMatrix"),
+    blocks = lapply(ms$blocks, function(x) x[c("idx", "sig", "S")])
+  )
+}
