@@ -24,3 +24,4 @@ src/tmp.def
 # pkgdown site
 docs
 bias/results/*.rds
+papers/
