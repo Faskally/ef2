@@ -14,7 +14,7 @@ abundance(
 )
 }
 \arguments{
-\item{object}{an efp2 fitted model}
+\item{object}{an efp2 or efn2 fitted model}
 
 \item{newdata}{an optional data.frame as for \code{\link{capture_prob}},
 which must also contain the counts used as the response in the model}
@@ -74,9 +74,19 @@ when comparing sites or years. A Poisson model for the counts with
 offset \eqn{\log(A P)}, where \eqn{A} is the area, is a model for the
 expected abundance.
 
+For a joint model fitted by \code{\link{efn2}}, the realised abundance
+is estimated as the catch plus the expected number of fish not caught,
+\eqn{T + \hat\lambda (1 - \hat P)}. Given the parameters, the number not
+caught is Poisson with mean \eqn{\lambda (1 - P)}, and its variance is
+combined with the uncertainty in \eqn{\hat\lambda} and \eqn{\hat P}, using
+the joint covariance matrix of the two models. The confidence interval is
+computed for the number not caught on the log scale, and the catch added.
+The expected abundance is \eqn{\hat\lambda}. Estimates are available for
+samples with a zero catch.
+
 Confidence intervals are computed on the log scale. When the total catch
-is zero the estimated abundance is zero and the confidence limits are
-\code{NA}.
+is zero the estimated abundance from an \code{efp2} fit is zero and the
+confidence limits are \code{NA}.
 
 With \code{by}, abundance is summed over the samples in each group, for
 example over the lifestages caught at a site in a year. The variation in

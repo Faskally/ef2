@@ -162,6 +162,20 @@ efn2 <- function(formula, abundance, data = NULL, pass = pass, id = id,
   out$catch <- setNames_(catch, levels(sample_id))
   out$N <- out$catch + out$lambda * (1 - out$P)
 
+  # if the model for abundance cannot describe the variation in the total
+  # catches, the fit can explain it by capture probability instead, with
+  # capture probability close to zero and abundance very large
+  if (any(out$P < 1e-3)) {
+    warning(
+      "cumulative capture probability is estimated close to zero for ",
+      sum(out$P < 1e-3), " sample(s), so the estimates of abundance are not ",
+      "reliable. The model for abundance may be too simple to describe the ",
+      "variation in the total catches: consider adding a random effect for ",
+      "samples, s(f, bs = \"re\"), to the abundance formula.",
+      call. = FALSE
+    )
+  }
+
   labels <- c(
     colnames(ms$X)[ms$fx_keep], ms$re_labels,
     colnames(msn$X)[msn$fx_keep], msn$re_labels

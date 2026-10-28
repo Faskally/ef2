@@ -10,7 +10,7 @@
 #' \eqn{i} is \eqn{p_i / P}. Confidence intervals are computed on the logit
 #' scale and back transformed.
 #'
-#' @param object an efp2 fitted model
+#' @param object an efp2 or efn2 fitted model
 #' @param newdata an optional data.frame with one row per pass, containing
 #'   the covariates in the model and the variables used for \code{pass} and
 #'   \code{id} in the call to \code{\link{efp2}}. If omitted the data used
@@ -117,9 +117,19 @@ capture_prob_parts <- function(object, newdata = NULL, gradient = FALSE) {
 #' offset \eqn{\log(A P)}, where \eqn{A} is the area, is a model for the
 #' expected abundance.
 #'
+#' For a joint model fitted by \code{\link{efn2}}, the realised abundance
+#' is estimated as the catch plus the expected number of fish not caught,
+#' \eqn{T + \hat\lambda (1 - \hat P)}. Given the parameters, the number not
+#' caught is Poisson with mean \eqn{\lambda (1 - P)}, and its variance is
+#' combined with the uncertainty in \eqn{\hat\lambda} and \eqn{\hat P}, using
+#' the joint covariance matrix of the two models. The confidence interval is
+#' computed for the number not caught on the log scale, and the catch added.
+#' The expected abundance is \eqn{\hat\lambda}. Estimates are available for
+#' samples with a zero catch.
+#'
 #' Confidence intervals are computed on the log scale. When the total catch
-#' is zero the estimated abundance is zero and the confidence limits are
-#' \code{NA}.
+#' is zero the estimated abundance from an \code{efp2} fit is zero and the
+#' confidence limits are \code{NA}.
 #'
 #' With \code{by}, abundance is summed over the samples in each group, for
 #' example over the lifestages caught at a site in a year. The variation in
@@ -175,6 +185,10 @@ capture_prob_parts <- function(object, newdata = NULL, gradient = FALSE) {
 abundance <- function(object, newdata = NULL, area = NULL, by = NULL,
   target = c("realised", "expected"), level = 0.95) {
   target <- match.arg(target)
+  if (inherits(object, "efn2")) {
+    return(abundance_efn2(object, newdata = newdata, area = area, by = by,
+      target = target, level = level))
+  }
   cp <- capture_prob_parts(object, newdata, gradient = TRUE)
   data <- cp$data
   sample <- cp$sample

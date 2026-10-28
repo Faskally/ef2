@@ -7,7 +7,7 @@
 capture_prob(object, newdata = NULL, se.fit = FALSE, level = 0.95)
 }
 \arguments{
-\item{object}{an efp2 fitted model}
+\item{object}{an efp2 or efn2 fitted model}
 
 \item{newdata}{an optional data.frame with one row per pass, containing
 the covariates in the model and the variables used for \code{pass} and

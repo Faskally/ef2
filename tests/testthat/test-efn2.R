@@ -69,14 +69,20 @@ test_that("estimated abundance and expected abundance", {
 
 test_that("random effects in both models", {
   data <- prep_efn2_data()
+  data$fsample <- factor(data$sampleID)
   m <- efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
-    abundance = ~ lifestage + s(siteID, bs = "re") + offset(log(area)),
+    abundance = ~ lifestage + s(siteID, bs = "re") + s(fsample, bs = "re") +
+      offset(log(area)),
     data = data, pass = pass, id = sampleID)
 
   expect_equal(m$convergence, 0)
   expect_equal(names(m$sigma), "s(visitID)")
-  expect_equal(names(m$sigma_n), "s(siteID)")
+  expect_equal(names(m$sigma_n), c("s(siteID)", "s(fsample)"))
   expect_true(is.matrix(m$Vp_joint))
+  # capture probability is close to that from efp2
+  m0 <- efp2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    data = data, pass = pass, id = sampleID)
+  expect_equal(m$P, m0$P, tolerance = 0.01)
 
   out <- capture.output(print(m))
   capture <- out[seq_len(grep("^Abundance", out) - 1)]
@@ -105,4 +111,72 @@ test_that("informative errors", {
     efn2(count ~ pass12, abundance = count ~ lifestage, data = data, pass = pass, id = sampleID),
     "one sided"
   )
+})
+
+test_that("a warning when capture probability is estimated close to zero", {
+  # without overdispersion in abundance, the variation in the total catches
+  # is explained by the random effects for capture probability
+  data <- prep_efn2_data()
+  expect_warning(
+    efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+      abundance = ~ lifestage + s(siteID, bs = "re") + offset(log(area)),
+      data = data, pass = pass, id = sampleID),
+    "too simple"
+  )
+})
+
+test_that("abundance from an efn2 fit", {
+  data <- prep_efn2_data()
+  data$fsample <- factor(data$sampleID)
+  m <- efn2(count ~ lifestage + pass12 + s(visitID, bs = "re"),
+    abundance = ~ lifestage + s(siteID, bs = "re") + s(fsample, bs = "re") +
+      offset(log(area)),
+    data = data, pass = pass, id = sampleID)
+
+  a <- abundance(m, area = "area")
+  ids <- as.character(a$id)
+  expect_equal(a$N, unname(m$N[ids]))
+  expect_equal(a$lambda, unname(m$lambda[ids]))
+  expect_true(all(a$lower >= a$catch & a$lower < a$N & a$N < a$upper))
+  expect_equal(a$density, a$N / a$area)
+
+  e <- abundance(m, target = "expected")
+  expect_equal(e$N, unname(m$lambda[ids]))
+  expect_true(all(e$lower < e$N & e$N < e$upper))
+
+  # the variance of the number not caught: Poisson plus the delta method,
+  # with a finite difference gradient
+  missed <- function(object) {
+    cp <- capture_prob(object)
+    sdata <- object$data[!duplicated(object$data$sampleID), ]
+    Xn <- ef2:::efp_lpmatrix(list(Gsetup = object$Gsetup_n, G = object$G_n), sdata)
+    lambda <- exp(drop(Xn %*% object$gam_coefficients_n) + log(sdata$area))
+    lambda * (1 - cp$P)
+  }
+  h <- 1e-6
+  grad <- function(component, cols) {
+    sapply(cols, function(j) {
+      up <- down <- m
+      up[[component]][j] <- up[[component]][j] + h
+      down[[component]][j] <- down[[component]][j] - h
+      (missed(up) - missed(down)) / (2 * h)
+    })
+  }
+  D <- cbind(grad("gam_coefficients", m$gam_cols), grad("gam_coefficients_n", m$gam_cols_n))
+  M <- a$N - a$catch
+  expect_equal(a$se^2, M + rowSums((D %*% m$Vp_joint) * D), tolerance = 1e-5)
+
+  # sums over groups
+  g <- abundance(m, by = c("siteID", "year"))
+  samples <- data[match(ids, data$sampleID), ]
+  expect_equal(g$N, as.vector(tapply(a$N, paste(samples$siteID, samples$year), sum)[paste(g$siteID, g$year)]))
+  expect_true(all(g$se > 0))
+
+  # a sample with no fish caught still has an estimate
+  zero <- data[data$sampleID == data$sampleID[1], ]
+  zero$count <- 0
+  z <- abundance(m, newdata = zero)
+  expect_equal(z$catch, 0)
+  expect_gt(z$N, 0)
+  expect_true(z$lower >= 0 && z$upper > z$N)
 })
